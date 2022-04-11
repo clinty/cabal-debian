@@ -50,7 +50,7 @@ module Debian.Debianize.DebInfo
     , maintainerOption
     , uploadersOption
     , utilsPackageNameBase
-    , xDescriptionText
+    , descriptionText
     , comments
     , missingDependencies
     , extraLibMap
@@ -202,8 +202,8 @@ data DebInfo
       , _utilsPackageNameBase :: Maybe String
       -- ^ Name of a package that will get left-over data files and executables.
       -- If there are more than one, each package will get those files.
-      , _xDescriptionText :: Maybe Text
-      -- ^ The text for the X-Description field of the Source package stanza.
+      , _descriptionText :: Maybe Text
+      -- ^ The text for the Description field of the Source package stanza.
       , _comments :: Maybe [[Text]]
       -- ^ Each element is a comment to be added to the changelog, where the
       -- element's text elements are the lines of the comment.
@@ -345,7 +345,7 @@ makeDebInfo fs =
     , _maintainerOption = Nothing
     , _uploadersOption = []
     , _utilsPackageNameBase = Nothing
-    , _xDescriptionText = Nothing
+    , _descriptionText = Nothing
     , _comments = Nothing
     , _missingDependencies = mempty
     , _extraLibMap = mempty

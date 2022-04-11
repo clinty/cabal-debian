@@ -23,7 +23,7 @@ import Debian.Debianize.Monad (DebianT)
 import Debian.Debianize.Prelude (escapeDebianWildcards, showDeps')
 import qualified Debian.Debianize.BinaryDebDescription as B (architecture, BinaryDebDescription, binaryPriority, multiArch, binarySection, breaks, builtUsing, conflicts, depends, description, essential, package, PackageRelations, preDepends, provides, recommends, relations, replaces, suggests)
 import Debian.Debianize.CopyrightDescription (CopyrightDescription)
-import qualified Debian.Debianize.SourceDebDescription as S (binaryPackages, buildConflicts, buildConflictsIndep, buildDepends, buildDependsIndep, dmUploadAllowed, homepage, maintainer, priority, rulesRequiresRoot, section, source, SourceDebDescription, standardsVersion, uploaders, vcsFields, VersionControlSpec(VCSArch, VCSBrowser, VCSBzr, VCSCvs, VCSDarcs, VCSGit, VCSHg, VCSMtn, VCSSvn), xDescription, XField(XField), XFieldDest(B, C, S), xFields)
+import qualified Debian.Debianize.SourceDebDescription as S (binaryPackages, buildConflicts, buildConflictsIndep, buildDepends, buildDependsIndep, dmUploadAllowed, homepage, maintainer, priority, rulesRequiresRoot, section, source, SourceDebDescription, standardsVersion, uploaders, vcsFields, VersionControlSpec(VCSArch, VCSBrowser, VCSBzr, VCSCvs, VCSDarcs, VCSGit, VCSHg, VCSMtn, VCSSvn), sourceDescription, XField(XField), XFieldDest(B, C, S), xFields)
 import Debian.Policy (maintainerOfLastResort)
 import Debian.Pretty (PP(..), ppShow, prettyText, ppText, ppPrint)
 import Debian.Relation (BinPkgName(BinPkgName), Relations)
@@ -191,7 +191,7 @@ controlFile src =
             mField "Homepage" (view S.homepage src) ++
             List.map vcsField (Set.toList (view S.vcsFields src)) ++
             List.map xField (Set.toList (view S.xFields src)) ++
-            mField "X-Description" (view S.xDescription src)) :
+            mField "Description" (view S.sourceDescription src)) :
            List.map binary (view S.binaryPackages src))
     }
     where

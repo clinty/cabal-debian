@@ -19,7 +19,7 @@ module Debian.Debianize.SourceDebDescription
     , homepage
     , vcsFields
     , xFields
-    , xDescription
+    , sourceDescription
     , binaryPackages
     , VersionControlSpec(..)
     , XField(..)
@@ -71,7 +71,7 @@ data SourceDebDescription
       , _buildConflicts :: Relations
       , _buildDependsIndep :: Relations
       , _buildConflictsIndep :: Relations
-      , _xDescription :: Maybe Text
+      , _sourceDescription :: Maybe Text
       , _binaryPackages :: [BinaryDebDescription]
       -- ^ The binary debs.  This should be a map, but we may need to preserve the order
       } deriving (Eq, Ord, Show, Data, Typeable)
@@ -103,7 +103,7 @@ newSourceDebDescription =
       , _homepage = Nothing
       , _vcsFields = Set.empty
       , _xFields = Set.empty
-      , _xDescription = Nothing -- Quick hack, I should maybe put this into _xFields
+      , _sourceDescription = Nothing
       , _binaryPackages = [] }
 
 newSourceDebDescription' :: SrcPkgName -> NameAddr -> SourceDebDescription
