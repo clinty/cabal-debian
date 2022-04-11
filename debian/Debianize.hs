@@ -42,7 +42,7 @@ main = performDebianization customize
 
              -- Add dependencies to the binary debs.
              (debInfo . binaryDebDescription (BinPkgName "cabal-debian") . relations . depends) %=
-                (++ (rels "apt-file, debian-policy, debhelper, haskell-devscripts (>= 0.8.19)"))
+                (++ (rels "apt-file, debian-policy, dh-sequence-haskell, haskell-devscripts (>= 0.16.8)"))
              (debInfo . binaryDebDescription (BinPkgName "libghc-cabal-debian-dev") . relations . depends) %=
                 (++ (rels "debian-policy"))
 
