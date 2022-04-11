@@ -318,7 +318,7 @@ finalizeControl currentUser =
        Just src <- use (A.debInfo . D.sourcePackageName)
        (A.debInfo . D.control . S.source) .= Just src
        desc' <- describe
-       (A.debInfo . D.control . S.xDescription) .?= Just desc'
+       (A.debInfo . D.control . S.description) .?= Just desc'
        -- control %= (\ y -> y { D.source = Just src, D.maintainer = Just maint })
 
 describe :: Monad m => CabalT m Text
