@@ -354,7 +354,7 @@ standardsVersionP :: O.Parser StandardsVersion
 standardsVersionP = O.option (parseStandardsVersion <$> O.str) m where
   m = O.help helpMsg
       <> O.long "standards-version"
-      <> O.value (parseStandardsVersion "4.5.0")
+      <> O.value (parseStandardsVersion "4.6.1")
       <> O.metavar "CABALVERSION"
   helpMsg = unlines [
     "Claim compatibility to this version of the Debian policy",
