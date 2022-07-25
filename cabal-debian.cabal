@@ -1,6 +1,6 @@
 Name:           cabal-debian
-Version:        5.1
-Copyright:      Copyright (c) 2007-2014, David Fox, Jeremy Shaw; 2017-2020 Clint Adams
+Version:        5.1.1
+Copyright:      Copyright (c) 2007-2014, David Fox, Jeremy Shaw; 2017-2022 Clint Adams
 License:        BSD3
 License-File:   LICENSE
 Author:         David Fox <dsf@seereason.com>
