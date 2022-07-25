@@ -39,8 +39,14 @@ import Distribution.PackageDescription as Cabal (BuildInfo(..), BuildInfo(buildT
 import qualified Distribution.PackageDescription as Cabal (PackageDescription(library, executables, testSuites))
 import Distribution.Pretty (prettyShow)
 import Distribution.Types.LegacyExeDependency (LegacyExeDependency(..))
-import Distribution.Types.PkgconfigDependency (PkgconfigDependency(..))
+#if MIN_VERSION_Cabal(3,4,0)
+import qualified Distribution.Compat.NonEmptySet as NES
+import Distribution.Types.LibraryName (defaultLibName)
+import Distribution.Version (anyVersion, asVersionIntervals, fromVersionIntervals, intersectVersionRanges, isNoVersion, toVersionIntervals, unionVersionRanges, VersionRange, withinVersion)
+#else
 import Distribution.Version (anyVersion, asVersionIntervals, fromVersionIntervals, intersectVersionRanges, invertVersionRange, isNoVersion, toVersionIntervals, unionVersionRanges, VersionRange, withinVersion)
+#endif
+import Distribution.Types.PkgconfigDependency (PkgconfigDependency(..))
 import Prelude hiding (init, log, map, unlines, unlines, writeFile)
 import System.Directory (findExecutable)
 import System.Exit (ExitCode(ExitSuccess))
@@ -111,7 +117,9 @@ setupBuildDepends = List.map BuildDepends . setupDepends
 -- | Take the intersection of all the dependencies on a given package name
 mergeCabalDependencies :: [Dependency] -> [Dependency]
 mergeCabalDependencies =
-#if MIN_VERSION_Cabal(3,0,0)
+#if MIN_VERSION_Cabal(3,4,0)
+    List.map (foldl1 (\ (Dependency name range1 _) (Dependency _ range2 _) -> Dependency name (intersectVersionRanges range1 range2) (NES.singleton defaultLibName))) . groupBy ((==) `on` dependencyPackage) . sortBy (compare `on` dependencyPackage)
+#elif MIN_VERSION_Cabal(3,0,0)
     List.map (foldl1 (\ (Dependency name range1 _) (Dependency _ range2 _) -> Dependency name (intersectVersionRanges range1 range2) mempty)) . groupBy ((==) `on` dependencyPackage) . sortBy (compare `on` dependencyPackage)
 #else
     List.map (foldl1 (\ (Dependency name range1) (Dependency _ range2) -> Dependency name (intersectVersionRanges range1 range2))) . groupBy ((==) `on` dependencyPackage) . sortBy (compare `on` dependencyPackage)
@@ -322,27 +330,37 @@ dependencies hc typ name cabalRange omitProfVersionDeps =
             False ->
                 Just <$> (cataVersionRange rangeToRange . normaliseVersionRange) range'''
           where
+#if !MIN_VERSION_Cabal(3,4,0)
             rangeToRange AnyVersionF                     = return $ Rel' (D.Rel dname Nothing Nothing)
+#endif
             rangeToRange (ThisVersionF v)                = (debianVersion' name >=> \ dv -> return $ Rel' (D.Rel dname (Just (D.EEQ dv)) Nothing)) v
             rangeToRange (LaterVersionF v)               = (debianVersion' name >=> \ dv -> return $ Rel' (D.Rel dname (Just (D.SGR dv)) Nothing)) v
             rangeToRange (EarlierVersionF v)             = (debianVersion' name >=> \ dv -> return $ Rel' (D.Rel dname (Just (D.SLT dv)) Nothing)) v
             rangeToRange (OrLaterVersionF v)             = (debianVersion' name >=> \ dv -> return $ Rel' (D.Rel dname (Just (D.GRE dv)) Nothing)) v
             rangeToRange (OrEarlierVersionF v)           = (debianVersion' name >=> \ dv -> return $ Rel' (D.Rel dname (Just (D.LTE dv)) Nothing)) v
+#if !MIN_VERSION_Cabal(3,4,0)
             rangeToRange (WildcardVersionF v)            = (\ x y -> debianVersion' name x >>= \ dvx ->
                                     debianVersion' name y >>= \ dvy ->
                                     return $ And [Rel' (D.Rel dname (Just (D.GRE dvx)) Nothing),
                                                   Rel' (D.Rel dname (Just (D.SLT dvy)) Nothing)]) v (wildcardUpperBound v)
+#endif
             rangeToRange (MajorBoundVersionF v)          = (\ x y -> debianVersion' name x >>= \ dvx ->
                                     debianVersion' name y >>= \ dvy ->
                                     return $ And [Rel' (D.Rel dname (Just (D.GRE dvx)) Nothing),
                                                   Rel' (D.Rel dname (Just (D.SLT dvy)) Nothing)]) v (majorUpperBound v)
             rangeToRange (UnionVersionRangesF v1 v2)     = (\ x y -> x >>= \ x' -> y >>= \ y' -> return $ Or [x', y']) v1 v2
             rangeToRange (IntersectVersionRangesF v1 v2) = (\ x y -> x >>= \ x' -> y >>= \ y' -> return $ And [x', y']) v1 v2
+#if !MIN_VERSION_Cabal(3,4,0)
             rangeToRange (VersionRangeParensF v)         = v
+#endif
             -- Choose the simpler of the two
             range''' = canon (simpler range' range'')
             -- Unrestrict the range for versions that we know don't exist for this debian package
+#if MIN_VERSION_Cabal(3,6,0)
+            range'' = range' -- inversion functions are gone
+#else
             range'' = canon (unionVersionRanges range' (invertVersionRange range))
+#endif
             -- Restrict the range to the versions specified for this debian package
             range' = intersectVersionRanges cabalRange' range
             -- When we see a cabal equals dependency we need to turn it into

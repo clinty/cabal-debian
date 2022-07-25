@@ -56,6 +56,9 @@ import qualified Distribution.PackageDescription as Cabal (PackageDescription(li
 #if MIN_VERSION_Cabal(3,2,0)
 import qualified Distribution.Utils.ShortText as ST
 #endif
+#if MIN_VERSION_Cabal(3,6,0)
+import qualified Distribution.Utils.Path as DUP
+#endif
 import Network.URI (URI, parseURI)
 import Prelude hiding (init, init, log, log, unlines, readFile)
 import Text.PrettyPrint.HughesPJClass (text)
@@ -253,14 +256,23 @@ defaultLicenseDescriptions license = \case
 -- provided @copyright0@ value.
 defaultCopyrightDescription :: Cabal.PackageDescription -> IO CopyrightDescription
 defaultCopyrightDescription pkgDesc = do
+#if MIN_VERSION_Cabal(3,6,0)
+  let (debianCopyrightPath, otherLicensePaths) = partition (== DUP.unsafeMakeSymbolicPath "debian/copyright") (Cabal.licenseFiles pkgDesc)
+#else
   let (debianCopyrightPath, otherLicensePaths) = partition (== "debian/copyright") (Cabal.licenseFiles pkgDesc)
+#endif
       license =  either (\x -> OtherLicense ("SPDX license: " ++ show x)) fromCabalLicense $ Cabal.licenseRaw pkgDesc
       pkgname = unPackageName . Cabal.pkgName . Cabal.package $ pkgDesc
       maintainer = Cabal.maintainer $ pkgDesc
   -- This is an @Nothing@ unless debian/copyright is (for some
   -- reason) mentioned in the cabal file.
+#if MIN_VERSION_Cabal(3,6,0)
+  debianCopyrightText <- mapM (readFileMaybe . DUP.getSymbolicPath) debianCopyrightPath >>= return . listToMaybe . catMaybes
+  licenseCommentPairs <- mapM (readFileMaybe . DUP.getSymbolicPath) otherLicensePaths >>= return . filter (isJust . snd) . zip otherLicensePaths
+#else
   debianCopyrightText <- mapM readFileMaybe debianCopyrightPath >>= return . listToMaybe . catMaybes
   licenseCommentPairs <- mapM readFileMaybe otherLicensePaths >>= return . filter (isJust . snd) . zip otherLicensePaths
+#endif
   return $ case debianCopyrightText of
     Just t ->
         def { _summaryComment = Just t }
@@ -270,7 +282,11 @@ defaultCopyrightDescription pkgDesc = do
         def { _filesAndLicenses =
                   [ sourceDefaultFilesDescription copyrt license,
                     debianDefaultFilesDescription license ] ++
+#if MIN_VERSION_Cabal(3,6,0)
+                  defaultLicenseDescriptions license (map (\(x,y) -> (DUP.getSymbolicPath x, y)) licenseCommentPairs)
+#else
                   defaultLicenseDescriptions license licenseCommentPairs
+#endif
             , _upstreamName = Just . pack $ pkgname
             , _upstreamSource = Just . pack $ "https://hackage.haskell.org/package/" ++ pkgname
             , _upstreamContact = nothingIf Text.null (toText maintainer)
