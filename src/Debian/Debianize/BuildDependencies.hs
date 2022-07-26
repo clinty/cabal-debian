@@ -302,7 +302,9 @@ dependencies hc typ name cabalRange omitProfVersionDeps =
             rangeToRange (ThisVersionF v)                = (debianVersion' name >=> \ dv -> return $ Rel' (D.Rel dname (Just (D.EEQ dv)) Nothing)) v
             rangeToRange (LaterVersionF v)               = (debianVersion' name >=> \ dv -> return $ Rel' (D.Rel dname (Just (D.SGR dv)) Nothing)) v
             rangeToRange (EarlierVersionF v)             = (debianVersion' name >=> \ dv -> return $ Rel' (D.Rel dname (Just (D.SLT dv)) Nothing)) v
-            rangeToRange (OrLaterVersionF v)             = (debianVersion' name >=> \ dv -> return $ Rel' (D.Rel dname (Just (D.GRE dv)) Nothing)) v
+            rangeToRange (OrLaterVersionF v)
+               | v == mkVersion [0] = return $ Rel' (D.Rel dname Nothing Nothing)
+               | otherwise = (debianVersion' name >=> \ dv -> return $ Rel' (D.Rel dname (Just (D.GRE dv)) Nothing)) v
             rangeToRange (OrEarlierVersionF v)           = (debianVersion' name >=> \ dv -> return $ Rel' (D.Rel dname (Just (D.LTE dv)) Nothing)) v
 #if !MIN_VERSION_Cabal(3,4,0)
             rangeToRange (WildcardVersionF v)            = (\ x y -> debianVersion' name x >>= \ dvx ->
