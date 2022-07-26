@@ -30,12 +30,6 @@ debianDefaults =
        -- (eponymous) debian package names
        mapM_ (\name -> (A.debInfo . D.execMap) %= Map.insert name [[Rel (BinPkgName name) Nothing Nothing]])
             ["alex", "c2hs", "ghc", "happy", "hsx2hs"]
-       -- The parsec debs are suffixed with either "2" or "3"
-#if !MIN_VERSION_base(4,11,1)
--- The deb of ghc-8.4.3 changes the libghc-parsec3-dev name to libghc-parsec-deb
-       mapCabal (mkPackageName "parsec") (DebBase "parsec3")
-#endif
-       -- Similar split for quickcheck
        mapCabal (mkPackageName "QuickCheck") (DebBase "quickcheck2")
        -- Something was required for this package at one time - it
        -- looks like a no-op now

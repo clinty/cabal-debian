@@ -25,7 +25,6 @@ import Data.Char(toUpper)
 import Data.Foldable (forM_)
 import Data.Maybe.Extended (fromMaybe)
 import Data.Maybe.Extended (nothingIf)
-import Data.Monoid ((<>))
 import Debian.Debianize.BasicInfo (EnvSet(EnvSet), cleanOS, dependOS, buildOS, Flags(..))
 import Debian.Debianize.DebInfo (TestsStatus(..))
 import Debian.Debianize.Monad

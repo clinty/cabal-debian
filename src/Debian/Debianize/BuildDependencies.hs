@@ -16,7 +16,6 @@ import Data.Function (on)
 import Data.List as List (filter, groupBy, map, minimumBy, nub, sortBy)
 import Data.Map as Map (lookup, Map)
 import Data.Maybe (catMaybes, fromMaybe, isJust, isNothing, listToMaybe, mapMaybe, maybeToList)
-import Data.Monoid ((<>))
 import Data.Set as Set (empty, fold, fromList, map, member, Set, singleton, toList, union)
 import Debian.Debianize.Prelude
 import Debian.Debianize.BasicInfo (compilerFlavor)
@@ -78,11 +77,7 @@ unboxDependency :: Dependency_ -> Maybe Dependency
 unboxDependency (BuildDepends d) = Just d
 unboxDependency (BuildTools d) = Just d
 unboxDependency (PkgConfigDepends d) = Just d
-#if MIN_VERSION_Cabal(3,0,0)
 unboxDependency (ExtraLibs _) = Nothing -- Dependency (PackageName d) anyVersion mempty
-#else
-unboxDependency (ExtraLibs _) = Nothing -- Dependency (PackageName d) anyVersion
-#endif
 
 -- |Debian packages don't have per binary package build dependencies,
 -- so we just gather them all up here.
@@ -119,17 +114,11 @@ mergeCabalDependencies :: [Dependency] -> [Dependency]
 mergeCabalDependencies =
 #if MIN_VERSION_Cabal(3,4,0)
     List.map (foldl1 (\ (Dependency name range1 _) (Dependency _ range2 _) -> Dependency name (intersectVersionRanges range1 range2) (NES.singleton defaultLibName))) . groupBy ((==) `on` dependencyPackage) . sortBy (compare `on` dependencyPackage)
-#elif MIN_VERSION_Cabal(3,0,0)
-    List.map (foldl1 (\ (Dependency name range1 _) (Dependency _ range2 _) -> Dependency name (intersectVersionRanges range1 range2) mempty)) . groupBy ((==) `on` dependencyPackage) . sortBy (compare `on` dependencyPackage)
 #else
-    List.map (foldl1 (\ (Dependency name range1) (Dependency _ range2) -> Dependency name (intersectVersionRanges range1 range2))) . groupBy ((==) `on` dependencyPackage) . sortBy (compare `on` dependencyPackage)
+    List.map (foldl1 (\ (Dependency name range1 _) (Dependency _ range2 _) -> Dependency name (intersectVersionRanges range1 range2) mempty)) . groupBy ((==) `on` dependencyPackage) . sortBy (compare `on` dependencyPackage)
 #endif
     where
-#if MIN_VERSION_Cabal(3,0,0)
       dependencyPackage (Dependency x _ _) = x
-#else
-      dependencyPackage (Dependency x _) = x
-#endif
 
 -- The haskell-devscripts-minimal package contains the hlibrary.mk file with
 -- the rules for building haskell packages.
@@ -220,11 +209,7 @@ debianBuildDepsIndep pkgDesc =
 -- documentation package for any libraries which are build
 -- dependencies, so we have use to all the cross references.
 docDependencies :: (MonadIO m) => Dependency_ -> CabalT m D.Relations
-#if MIN_VERSION_Cabal(3,0,0)
 docDependencies (BuildDepends (Dependency name ranges _)) =
-#else
-docDependencies (BuildDepends (Dependency name ranges)) =
-#endif
     do hc <- use (A.debInfo . D.flags . compilerFlavor)
        let hcs = singleton hc -- vestigial
        omitProfDeps <- use (A.debInfo . D.omitProfVersionDeps)
@@ -235,46 +220,27 @@ docDependencies _ = return []
 -- libraries and the documentation packages, used for creating cross
 -- references.  Also the packages associated with extra libraries.
 buildDependencies :: (MonadIO m) => Set (CompilerFlavor, B.PackageType) -> Dependency_ -> CabalT m D.Relations
-#if MIN_VERSION_Cabal(3,0,0)
 buildDependencies hcTypePairs (BuildDepends (Dependency name ranges _)) =
     use (A.debInfo . D.omitProfVersionDeps) >>= \ omitProfDeps ->
     concat <$> mapM (\ (hc, typ) -> dependencies hc typ name ranges omitProfDeps) (toList hcTypePairs)
-#else
-buildDependencies hcTypePairs (BuildDepends (Dependency name ranges)) =
-    use (A.debInfo . D.omitProfVersionDeps) >>= \ omitProfDeps ->
-    concat <$> mapM (\ (hc, typ) -> dependencies hc typ name ranges omitProfDeps) (toList hcTypePairs)
-#endif
 buildDependencies _ dep@(ExtraLibs _) =
     do mp <- use (A.debInfo . D.execMap)
        return $ concat $ adapt mp dep
 buildDependencies _ dep =
     case unboxDependency dep of
-#if MIN_VERSION_Cabal(3,0,0)
       Just (Dependency _name _ranges _) ->
-#else
-      Just (Dependency _name _ranges) ->
-#endif
           do mp <- view (A.debInfo . D.execMap) <$> get
              return $ concat $ adapt mp dep
       Nothing ->
           return []
 
 adapt :: Map.Map String Relations -> Dependency_ -> [Relations]
-#if MIN_VERSION_Cabal(3,0,0)
 adapt mp (PkgConfigDepends (Dependency pkg _ _)) =
     maybe (aptFile (unPackageName pkg)) (: []) (Map.lookup (unPackageName pkg) mp)
 adapt mp (BuildTools (Dependency pkg _ _)) =
     maybe (aptFile (unPackageName pkg)) (: []) (Map.lookup (unPackageName pkg) mp)
 adapt _flags (ExtraLibs x) = [x]
 adapt _flags (BuildDepends (Dependency pkg _ _)) = [[[D.Rel (D.BinPkgName (unPackageName pkg)) Nothing Nothing]]]
-#else
-adapt mp (PkgConfigDepends (Dependency pkg _)) =
-    maybe (aptFile (unPackageName pkg)) (: []) (Map.lookup (unPackageName pkg) mp)
-adapt mp (BuildTools (Dependency pkg _)) =
-    maybe (aptFile (unPackageName pkg)) (: []) (Map.lookup (unPackageName pkg) mp)
-adapt _flags (ExtraLibs x) = [x]
-adapt _flags (BuildDepends (Dependency pkg _)) = [[[D.Rel (D.BinPkgName (unPackageName pkg)) Nothing Nothing]]]
-#endif
 
 -- There are three reasons this may not work, or may work
 -- incorrectly: (1) the build environment may be a different

@@ -43,7 +43,6 @@ module Debian.Debianize.Prelude
     ) where
 
 
-import Control.Applicative ((<$>))
 import Control.Exception as E (bracket, catch, throw, try)
 import Control.Lens
 import Control.Monad (when)
@@ -54,7 +53,6 @@ import Data.List as List (dropWhileEnd, intersperse, lines, map)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Maybe (fromJust, fromMaybe, listToMaybe, mapMaybe)
-import Data.Monoid ((<>), mconcat)
 import Data.Set as Set (Set, toList)
 import qualified Data.Set as Set (findMin, fromList, null, size)
 import Data.Text as Text (Text, unpack)
