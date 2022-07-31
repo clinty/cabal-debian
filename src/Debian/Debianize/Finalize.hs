@@ -465,7 +465,7 @@ officialSettings = do
            S.homepage .?= Just ("https://hackage.haskell.org/package/" <> pack (unPackageName cabal))
            S.vcsFields %= Set.union (Set.fromList
               [ S.VCSBrowser packagesURI
-              , S.VCSGit  "https://salsa.debian.org/haskell-team/DHG_packages.git"
+              , S.VCSGit ("https://salsa.debian.org/haskell-team/DHG_packages.git [p/" <> pack src <> "]")
               ])
 
 putBuildDeps :: (MonadIO m) => (Relations -> Relations) -> PackageDescription -> CabalT m ()
