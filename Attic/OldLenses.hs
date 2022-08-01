@@ -39,7 +39,7 @@ module Debian.Debianize.OldLenses
     , utilsPackageNameBase
     , buildDir
     , watch
-    , xDescription
+    , Description
 
     -- * Source Package Build Dependencies
     , omitProfVersionDeps
