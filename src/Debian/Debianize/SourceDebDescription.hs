@@ -10,6 +10,7 @@ module Debian.Debianize.SourceDebDescription
     , dmUploadAllowed
     , priority
     , section
+    , rulesRequiresRoot
     , buildDepends
     , buildConflicts
     , buildDependsIndep
@@ -56,6 +57,8 @@ data SourceDebDescription
       -- ^ <http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Priority>
       , _section :: Maybe Section
       -- ^ <http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Section>
+      , _rulesRequiresRoot :: Bool
+      -- ^ <https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-rules-requires-root>
       , _standardsVersion :: Maybe StandardsVersion
       -- ^ <http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Standards-Version>
       , _homepage :: Maybe Text
@@ -91,6 +94,7 @@ newSourceDebDescription =
       , _dmUploadAllowed = False
       , _priority = Nothing
       , _section = Nothing
+      , _rulesRequiresRoot = False
       , _buildDepends = []
       , _buildConflicts = []
       , _buildDependsIndep  = []
