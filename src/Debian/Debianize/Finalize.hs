@@ -157,7 +157,7 @@ finalizeDebianization' goodies date currentUser debhelperCompat setupExists =
 
 watchAtom :: PackageName -> Text
 watchAtom pkgname =
-    pack $ "version=3\nhttps://hackage.haskell.org/package/" ++ unPackageName pkgname ++ "/distro-monitor .*-([0-9\\.]+)\\.(?:zip|tgz|tbz|txz|(?:tar\\.(?:gz|bz2|xz)))\n"
+    pack $ "version=4\nhttps://hackage.haskell.org/package/" ++ unPackageName pkgname ++ "/distro-monitor .*-([0-9\\.]+)\\.(?:zip|tgz|tbz|txz|(?:tar\\.(?:gz|bz2|xz)))\n"
 
 -- | Compute the final values of the BinaryDebDescription record
 -- description fields from the cabal descriptions and the values that
