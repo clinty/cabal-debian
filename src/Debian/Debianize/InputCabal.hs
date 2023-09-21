@@ -20,7 +20,11 @@ import Distribution.Compiler (CompilerInfo)
 import Distribution.Package (Package(packageId))
 import Distribution.PackageDescription as Cabal (PackageDescription)
 import Distribution.PackageDescription.Configuration (finalizePD)
+#if MIN_VERSION_Cabal(3,8,1)
+import Distribution.Simple.PackageDescription (readGenericPackageDescription)
+#else
 import Distribution.PackageDescription.Parsec (readGenericPackageDescription)
+#endif
 import Distribution.Types.ComponentRequestedSpec (ComponentRequestedSpec(ComponentRequestedSpec))
 import Distribution.Simple.Utils (defaultPackageDesc, die', setupMessage)
 import Distribution.System as Cabal (buildArch, Platform(..))

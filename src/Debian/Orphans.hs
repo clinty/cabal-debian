@@ -34,16 +34,24 @@ deriving instance Ord AbiTag
 deriving instance Data Compiler
 deriving instance Data CompilerId
 
+#if !MIN_VERSION_Cabal(3,10,1)
 deriving instance Ord Language
+#endif
 deriving instance Ord Compiler
 deriving instance Ord NameAddr
+#if !MIN_VERSION_Cabal(3,10,1)
 deriving instance Ord License
+#endif
 
+#if !MIN_VERSION_Cabal(3,10,1)
 instance Ord Executable where
     compare = compare `on` exeName
+#endif
 
+#if !MIN_VERSION_Cabal(3,8,1)
 instance Ord PackageDescription where
     compare = compare `on` package
+#endif
 
 dropPrefix :: String -> String -> Maybe String
 dropPrefix p s = if isPrefixOf p s then Just (drop (length p) s) else Nothing
