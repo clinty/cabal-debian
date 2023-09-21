@@ -461,7 +461,7 @@ officialSettings = do
 
         let packagesURI = "https://salsa.debian.org/haskell-team/DHG_packages/tree/master/p/" <> pack src
         zoom D.control $ do
-           S.standardsVersion .?= Just (parseStandardsVersion "4.6.1")
+           S.standardsVersion .?= Just (parseStandardsVersion "4.6.2")
            S.homepage .?= Just ("https://hackage.haskell.org/package/" <> pack (unPackageName cabal))
            S.vcsFields %= Set.union (Set.fromList
               [ S.VCSBrowser packagesURI
