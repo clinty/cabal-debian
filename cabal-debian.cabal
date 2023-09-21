@@ -1,7 +1,7 @@
 cabal-version:  3.0
 Name:           cabal-debian
 Version:        5.2.1
-Copyright:      Copyright (c) 2007-2014, David Fox, Jeremy Shaw; 2017-2022 Clint Adams
+Copyright:      Copyright (c) 2007-2014, David Fox, Jeremy Shaw; 2017-2023 Clint Adams
 License:        BSD-3-Clause
 License-File:   LICENSE
 Author:         David Fox <dsf@seereason.com>
@@ -144,7 +144,7 @@ Extra-Source-Files:
   test-data/artvaluereport2/output/debian/artvaluereport2-backups.install
   test-data/artvaluereport2/output/debian/copyright
   test-data/artvaluereport2/output/debian/source/format
-Tested-With: GHC ==9.2.3 || ==9.0.2 || ==8.10.7 || ==8.8.4
+Tested-With: GHC ==9.6.2 || ==9.4.7 || ==9.2.8 || ==9.0.2 || ==8.10.7
 
 Source-Repository head
   type: git
