@@ -1,9 +1,9 @@
 Source: haskell-creativeprompts
 Maintainer: Jeremy Shaw <jeremy@seereason.com>
-Priority: extra
+Priority: optional
 Section: haskell
 Build-Depends: debhelper (>= 9)
-	       , haskell-devscripts-minimal | haskell-devscripts (>= 0.8)
+	       , haskell-devscripts-minimal | haskell-devscripts (>= 0.13)
 	       , cdbs
                , ghc
                , ghc-prof

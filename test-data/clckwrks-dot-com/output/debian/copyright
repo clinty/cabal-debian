@@ -1,17 +1,17 @@
-Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: clckwrks-dot-com
 Upstream-Contact: Jeremy Shaw <jeremy@n-heptane.com>
 Source: https://hackage.haskell.org/package/clckwrks-dot-com
 
 Files: *
 Copyright: Copyright (c) 2012, Jeremy Shaw
-License: BSD3
+License: BSD-3-clause
 
 Files: debian/*
 Copyright: held by the contributors mentioned in debian/changelog
-License: BSD3
+License: BSD-3-clause
 
-License: BSD3
+License: BSD-3-clause
  Copyright (c) 2012, Jeremy Shaw
  .
  All rights reserved.

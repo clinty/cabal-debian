@@ -1,6 +1,6 @@
 Source: haskell-devscripts
 Section: haskell
-Priority: extra
+Priority: optional
 Maintainer: Debian Haskell Group <pkg-haskell-maintainers@lists.alioth.debian.org>
 Uploaders: Marco Silva <marcot@debian.org>, Joachim Breitner <nomeata@debian.org>
 Build-Depends: debhelper (>= 7)

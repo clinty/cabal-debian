@@ -8,12 +8,7 @@ DEB_DEFAULT_COMPILER = ghc
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/hlibrary.mk
 
-build/clckwrks-dot-com-production:: build-ghc-stamp
-
-build/clckwrks-dot-com-backups:: build-ghc-stamp
-
-binary-fixup/clckwrks-dot-com-production::
-	install -Dps dist-ghc/build/clckwrks-dot-com-server/clckwrks-dot-com-server debian/clckwrks-dot-com-production/usr/bin/clckwrks-dot-com-production
+build/haskell-clckwrks-dot-com-utils:: build-ghc-stamp
 
 binary-fixup/clckwrks-dot-com-production::
 	echo -n 'haskell:Depends=' >> debian/clckwrks-dot-com-production.substvars

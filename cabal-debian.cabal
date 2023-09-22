@@ -234,7 +234,6 @@ Executable cabal-debian
     pretty >= 1.1.2
 
 Test-Suite cabal-debian-tests
-  Buildable: False
   Default-Language: Haskell2010
   Type: exitcode-stdio-1.0
   Hs-Source-Dirs: .

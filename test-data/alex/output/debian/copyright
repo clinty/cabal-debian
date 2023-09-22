@@ -1,17 +1,17 @@
-Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: alex
 Upstream-Contact: Simon Marlow <marlowsd@gmail.com>
 Source: https://hackage.haskell.org/package/alex
 
 Files: *
 Copyright: (c) Chis Dornan, Simon Marlow
-License: BSD3
+License: BSD-3-clause
 
 Files: debian/*
 Copyright: held by the contributors mentioned in debian/changelog
-License: BSD3
+License: BSD-3-clause
 
-License: BSD3
+License: BSD-3-clause
  Copyright (c) 1995-2011, Chris Dornan and Simon Marlow
  All rights reserved.
  .

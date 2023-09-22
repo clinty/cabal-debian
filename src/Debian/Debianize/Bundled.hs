@@ -23,7 +23,7 @@ module Debian.Debianize.Bundled
 import Control.Exception (SomeException, try)
 import Control.Monad ((<=<))
 import Data.Char (isAlphaNum, toLower)
-import Data.List (groupBy, intercalate, isPrefixOf, stripPrefix)
+import Data.List (groupBy, intercalate, isPrefixOf)
 import Data.Maybe (listToMaybe, mapMaybe)
 import Data.Set as Set (difference, fromList)
 import Debian.GHC ({-instance Memoizable CompilerFlavor-})
@@ -151,9 +151,9 @@ tests = TestList [ TestCase (assertEqual "Bundled1"
                                Nothing
                                (parseMaybe parsePackageIdentifier "HUnit-1.2.3 "))
                  , TestCase $ do
-                     ghc <- head . lines <$> readProcess "which" ["ghc"] ""
-                     let ver = fmap (takeWhile (/= '/')) (stripPrefix "/opt/ghc/" ghc)
-                     acp <- runMemoized =<< aptCacheProvides (BinPkgName ("ghc" ++ maybe "" ("-" ++) ver))
+                     verstr <- head . lines <$> readProcess "ghc" ["--version"] ""
+                     let ver = Just . last . words $ verstr
+                     acp <- runMemoized =<< aptCacheProvides (BinPkgName ("ghc"))
                      let expected = Set.fromList
                                 -- This is the package list for ghc-7.10.3
                                 ["array", "base", "binary", "bin-package-db", "bytestring", "Cabal",
@@ -163,10 +163,14 @@ tests = TestList [ TestCase (assertEqual "Bundled1"
                          actual = Set.fromList (map (unPackageName . pkgName) acp)
                          missing (Just "8.0.1") = Set.fromList ["bin-package-db"]
                          missing (Just "8.0.2") = Set.fromList ["bin-package-db"]
+                         missing (Just "9.0.2") = Set.fromList ["bin-package-db", "hoopl"]
+                         missing (Just "9.4.6") = Set.fromList ["bin-package-db", "hoopl"]
                          missing _ = mempty
                          extra (Just "7.8.4") = Set.fromList ["haskell2010","haskell98","old-locale","old-time"]
                          extra (Just "8.0.1") = Set.fromList ["ghc-boot","ghc-boot-th","ghci"]
                          extra (Just "8.0.2") = Set.fromList ["ghc-boot","ghc-boot-th","ghci"]
+                         extra (Just "9.0.2") = Set.fromList ["exceptions", "ghc-bignum", "ghc-boot", "ghc-boot-th", "ghc-compact", "ghc-heap", "ghci", "libiserv", "mtl", "parsec", "stm", "text"]
+                         extra (Just "9.4.6") = Set.fromList ["exceptions", "ghc-bignum", "ghc-boot", "ghc-boot-th", "ghc-compact", "ghc-heap", "ghci", "libiserv", "mtl", "parsec", "stm", "text"]
                          extra _ = mempty
                      assertEqual "Bundled4"
                        (missing ver, extra ver)

@@ -1,9 +1,9 @@
 Source: haskell-artvaluereport2
-Priority: extra
+Priority: optional
 Section: haskell
 Maintainer: Clifford Beshers <beshers@seereason.com>
 Build-Depends: debhelper (>= 9)
-               , haskell-devscripts-minimal | haskell-devscripts (>= 0.8)
+               , haskell-devscripts-minimal | haskell-devscripts (>= 0.13)
                , cdbs
                , ghc
                , ghc-prof

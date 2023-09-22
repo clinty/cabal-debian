@@ -1,17 +1,17 @@
-Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: Diff
 Upstream-Contact: s.clover@gmail.com
 Source: https://hackage.haskell.org/package/Diff
 
 Files: *
 Copyright: (No copyright field in cabal file)
-License: BSD3
+License: BSD-3-clause
 
 Files: debian/*
 Copyright: held by the contributors mentioned in debian/changelog
-License: BSD3
+License: BSD-3-clause
 
-License: BSD3
+License: BSD-3-clause
  Copyright (c) Stering Clover 2008
  .
  All rights reserved.
