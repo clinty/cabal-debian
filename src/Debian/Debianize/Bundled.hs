@@ -151,8 +151,8 @@ tests = TestList [ TestCase (assertEqual "Bundled1"
                                Nothing
                                (parseMaybe parsePackageIdentifier "HUnit-1.2.3 "))
                  , TestCase $ do
-                     verstr <- head . lines <$> readProcess "ghc" ["--version"] ""
-                     let ver = Just . last . words $ verstr
+                     verstr <- head . lines <$> readProcess "ghc" ["--numeric-version"] ""
+                     let ver = Just verstr
                      acp <- runMemoized =<< aptCacheProvides (BinPkgName ("ghc"))
                      let expected = Set.fromList
                                 -- This is the package list for ghc-7.10.3

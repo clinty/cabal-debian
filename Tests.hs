@@ -681,8 +681,7 @@ test10 label =
                  old <- withCurrentDirectory outTop $ newFlags >>= execDebianT inputDebianization . D.makeDebInfo
                  let Just (ChangeLog (entry : _)) = view D.changelog old
                  new <- withCurrentDirectory inTop $
-                        newFlags >>= newCabalInfo >>=
-                        either (error "test10 - newCabalInfo failed") (execCabalT (debianize (defaultAtoms >> customize >> (liftCabal $ copyChangelogDate $ logDate entry))))
+                        newFlags >>= newCabalInfo >>= react entry
                  diff <- diffDebianizations old (view debInfo new)
                  assertEmptyDiff label diff)
     where
@@ -698,6 +697,9 @@ test10 label =
              (A.debInfo . D.control . S.section) .= Just (MainSection "haskell")
              (A.debInfo . D.utilsPackageNameBase) .= Just "seereason-darcs-backups"
              (A.debInfo . D.atomSet) %= (Set.insert $ D.InstallCabalExec (BinPkgName "seereason-darcs-backups") "seereason-darcs-backups" "/etc/cron.hourly")
+      react :: ChangeLogEntry -> Either String CabalInfo -> IO CabalInfo
+      react _ (Left e) = error ("test10 - newCabalInfo failed: " ++ e)
+      react entry (Right c) = execCabalT (debianize (defaultAtoms >> customize >> (liftCabal $ copyChangelogDate $ logDate entry))) c
 
 copyChangelogDate :: Monad m => String -> DebianT m ()
 copyChangelogDate date =
