@@ -56,23 +56,15 @@ Extra-Source-Files:
   test-data/clckwrks-dot-com/input/debian/Debianize.hs
   test-data/clckwrks-dot-com/input/LICENSE
   test-data/clckwrks-dot-com/input/clckwrks-dot-com.cabal
-  test-data/clckwrks-dot-com/output/debian/clckwrks-dot-com-production.postinst
   test-data/clckwrks-dot-com/output/debian/watch
-  test-data/clckwrks-dot-com/output/debian/cabalInstall/6cb4323c6b76525f567919adaf912663/clckwrks.com.conf
   test-data/clckwrks-dot-com/output/debian/changelog
-  test-data/clckwrks-dot-com/output/debian/clckwrks-dot-com-production.links
-  test-data/clckwrks-dot-com/output/debian/clckwrks-dot-com-backups.postinst
-  test-data/clckwrks-dot-com/output/debian/clckwrks-dot-com-production.logrotate
-  test-data/clckwrks-dot-com/output/debian/clckwrks-dot-com-backups.install
-  test-data/clckwrks-dot-com/output/debian/clckwrks-dot-com-production.install
-  test-data/clckwrks-dot-com/output/debian/clckwrks-dot-com-production.init
   test-data/clckwrks-dot-com/output/debian/Debianize.hs
   test-data/clckwrks-dot-com/output/debian/rules
   test-data/clckwrks-dot-com/output/debian/compat
   test-data/clckwrks-dot-com/output/debian/source/format
   test-data/clckwrks-dot-com/output/debian/control
   test-data/clckwrks-dot-com/output/debian/copyright
-  test-data/clckwrks-dot-com/output/debian/clckwrks-dot-com-production.dirs
+  test-data/clckwrks-dot-com/output/debian/haskell-clckwrks-dot-com-utils.install
   test-data/haskell-devscripts/debian/manpages
   test-data/haskell-devscripts/debian/changelog
   test-data/haskell-devscripts/debian/install
