@@ -405,13 +405,15 @@ finalizeChangelog date currentUser =
     where
       fixLog :: Maybe SrcPkgName -> V.DebianVersion -> Maybe [[Text]] -> Either String NameAddr -> Text -> Maybe ChangeLog -> Maybe ChangeLog
       -- Ensure that the package name is correct in the first log entry.
-      fixLog src ver cmts _maint _ (Just (ChangeLog (entry : older)))
+      fixLog src ver cmts _maint _ (Just (ChangeLog (entry@Entry{} : older)))
           | logVersion entry == ver =
               let entry' = entry { logPackage = show (pretty (PP src))
                                  , logComments = logComments entry ++ "\n" ++
                                                  (List.unlines $ List.map (("  * " <>) . List.intercalate "\n    " . List.map unpack) (fromMaybe [] cmts))
                                  } in
               Just (ChangeLog (entry' : older))
+      fixLog _src _ver _cmts _maint _ (Just (ChangeLog (entry@WhiteSpace{} : older))) =
+              Just (ChangeLog (entry : older))
       -- The newest log entry isn't exactly ver, build a new entry.
       fixLog src ver cmts maint msg log =
           let entry = Entry { logPackage = show (pretty (PP src))
