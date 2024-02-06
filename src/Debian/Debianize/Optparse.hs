@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE LambdaCase #-}
@@ -7,6 +8,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 module Debian.Debianize.Optparse (
   CommandLineOptions(..),
   BehaviorAdjustment,
@@ -19,7 +21,6 @@ import Control.Applicative (many, (<|>))
 import Control.Lens
 import Control.Monad.State.Class (MonadState)
 import Control.Monad.Trans
-import Control.Newtype.Generics
 import Data.Bifunctor (first)
 import Data.Char(toUpper)
 import Data.Foldable (forM_)
@@ -53,35 +54,21 @@ import qualified Options.Applicative as O
 
 data HaddockStatus = HaddockEnabled | HaddockDisabled deriving Eq
 data ProfilingStatus = ProfilingEnabled | ProfilingDisabled deriving Eq
-data OfficialStatus = Official| NonOfficial deriving Eq
-newtype BuildDep = BuildDep Relations deriving Generic
-instance Newtype BuildDep
-newtype BuildDepIndep = BuildDepIndep Relations deriving Generic
-instance Newtype BuildDepIndep
-newtype DevDep = DevDep Relations deriving Generic
-instance Newtype DevDep
-newtype ExtraDepends = ExtraDepends (BinPkgName, Relations) deriving Generic
-instance Newtype ExtraDepends
-newtype ExtraConflicts = ExtraConflicts (BinPkgName, Relations) deriving Generic
-instance Newtype ExtraConflicts
-newtype ExtraProvides = ExtraProvides (BinPkgName, Relations) deriving Generic
-instance Newtype ExtraProvides
-newtype ExtraReplaces = ExtraReplaces (BinPkgName, Relations) deriving Generic
-instance Newtype ExtraReplaces
-newtype ExtraRecommends = ExtraRecommends (BinPkgName, Relations) deriving Generic
-instance Newtype ExtraRecommends
-newtype ExtraSuggests = ExtraSuggests (BinPkgName, Relations) deriving Generic
-instance Newtype ExtraSuggests
-newtype CabalDebMapping = CabalDebMapping (PackageName, Relations) deriving Generic
-instance Newtype CabalDebMapping
-newtype ExecDebMapping = ExecDebMapping (String, Relations) deriving Generic
-instance Newtype ExecDebMapping
-newtype Revision = Revision String deriving Generic
-instance Newtype Revision
-newtype CabalEpochMapping = CabalEpochMapping (PackageName, Int) deriving Generic
-instance Newtype CabalEpochMapping
-newtype CabalFlagMapping = CabalFlagMapping (FlagName, Bool) deriving Generic
-instance Newtype CabalFlagMapping
+data OfficialStatus = Official | NonOfficial deriving Eq
+newtype BuildDep = BuildDep Relations deriving (Generic, Wrapped, Rewrapped BuildDep)
+newtype BuildDepIndep = BuildDepIndep Relations deriving (Generic, Wrapped, Rewrapped BuildDepIndep)
+newtype DevDep = DevDep Relations deriving (Generic, Wrapped, Rewrapped DevDep)
+newtype ExtraDepends = ExtraDepends (BinPkgName, Relations) deriving (Generic, Wrapped, Rewrapped ExtraDepends)
+newtype ExtraConflicts = ExtraConflicts (BinPkgName, Relations) deriving (Generic, Wrapped, Rewrapped ExtraConflicts)
+newtype ExtraProvides = ExtraProvides (BinPkgName, Relations) deriving (Generic, Wrapped, Rewrapped ExtraProvides)
+newtype ExtraReplaces = ExtraReplaces (BinPkgName, Relations) deriving (Generic, Wrapped, Rewrapped ExtraReplaces)
+newtype ExtraRecommends = ExtraRecommends (BinPkgName, Relations) deriving (Generic, Wrapped, Rewrapped ExtraRecommends)
+newtype ExtraSuggests = ExtraSuggests (BinPkgName, Relations) deriving (Generic, Wrapped, Rewrapped ExtraSuggests)
+newtype CabalDebMapping = CabalDebMapping (PackageName, Relations) deriving (Generic, Wrapped)
+newtype ExecDebMapping = ExecDebMapping (String, Relations) deriving (Generic, Wrapped, Rewrapped ExecDebMapping)
+newtype Revision = Revision String deriving (Generic, Wrapped, Rewrapped Revision)
+newtype CabalEpochMapping = CabalEpochMapping (PackageName, Int) deriving (Generic, Wrapped)
+newtype CabalFlagMapping = CabalFlagMapping (FlagName, Bool) deriving (Generic, Wrapped)
 
 -- | This data type is an abomination. It represent information,
 -- provided on command line. Part of such information provides
@@ -399,9 +386,9 @@ devDepP = many $ O.option (DevDep <$> relationsR) m where
 --
 -- Nice to know, but now, to me, it would introduce more complexity,
 -- than eliminate.
-mkExtraP :: (Newtype n, O n ~ (BinPkgName, Relations))
-            => String -> O.Parser [n]
-mkExtraP long@(c:cr) = many $ O.option (pack <$> extraRelationsR) m where
+mkExtraP :: (Wrapped s, Rewrapped s s, Unwrapped s ~ (BinPkgName, Relations))
+             => String -> O.Parser [s]
+mkExtraP long@(c:cr) = many $ O.option (view _Unwrapped <$> extraRelationsR) m where
     fieldName = toUpper c : cr
     m = O.help helpMsg
         <> O.long long
@@ -615,7 +602,7 @@ handleBehaviorAdjustment (BehaviorAdjustment {..}) = do
  forM_ _cabalEpochMapping $ \(CabalEpochMapping (pkg, num)) -> A.epochMap %= Map.insert pkg num
  zoom A.debInfo $ do
   forM_ _executable $ (D.executable %=) . uncurry Map.insert
-  forM_ _execDebMapping $ (D.execMap %=) . uncurry Map.insert . unpack
+  forM_ _execDebMapping $ (D.execMap %=) . uncurry Map.insert . view _Wrapped
   forM_ _missingDependency $ (D.missingDependencies %=) . Set.insert
   D.utilsPackageNameBase .= _defaultPackage
   D.noDocumentationLibrary .= (HaddockDisabled `elem` _haddock)
@@ -624,10 +611,10 @@ handleBehaviorAdjustment (BehaviorAdjustment {..}) = do
   D.sourcePackageName .= _sourcePackageName
   D.maintainerOption .= Just _maintainer
   D.sourceFormat .= _sourceFormat
-  D.revision .= unpack `fmap` _revision
+  D.revision .= view _Wrapped `fmap` _revision
   D.debVersion .= _debianVersion
   D.uploadersOption %= (++ _uploaders)
-  D.extraDevDeps %= (++ concatMap unpack _devDep)
+  D.extraDevDeps %= (++ concatMap (view _Wrapped) _devDep)
   forM_ _cabalDebMapping $ \(CabalDebMapping (pkg, rels)) -> do
     D.extraLibMap %= Map.insert (unPackageName pkg) rels
   addExtra _extraDepends B.depends
@@ -641,14 +628,15 @@ handleBehaviorAdjustment (BehaviorAdjustment {..}) = do
   zoom D.control $ do
     S.section .= Just _sourceSection
     S.standardsVersion .= Just _standardsVersion
-    S.buildDepends %= (++ concatMap unpack _buildDep)
-    S.buildDepends %= (++ concatMap unpack _devDep)
-    S.buildDependsIndep %= (++ concatMap unpack _buildDepIndep)
+    S.buildDepends %= (++ concatMap (view _Wrapped) _buildDep)
+    S.buildDepends %= (++ concatMap (view _Wrapped) _devDep)
+    S.buildDependsIndep %= (++ concatMap (view _Wrapped) _buildDepIndep)
 
-addExtra :: (MonadState D.DebInfo m, Newtype n, O n ~ (BinPkgName, Relations)) =>
+addExtra :: (MonadState D.DebInfo m, Wrapped n, Rewrapped n n,
+             Unwrapped n ~ (BinPkgName, Relations)) =>
             [n] -> Lens' B.PackageRelations Relations -> m ()
 addExtra extra lens' = forM_ extra $ \arg -> do
-  let (pkg, rel) = unpack arg
+  let (pkg, rel) = view _Wrapped arg
   D.binaryDebDescription pkg . B.relations . lens' %= (++ rel)
 
 parseProgramArguments' :: [String] -> IO CommandLineOptions

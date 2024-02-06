@@ -162,7 +162,6 @@ Library
     lens,
     mtl,
     network-uri,
-    newtype-generics >= 0.4,
     parsec >= 3,
     pretty >= 1.1.2,
     process,
