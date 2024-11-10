@@ -26,7 +26,11 @@ import Distribution.Simple.PackageDescription (readGenericPackageDescription)
 import Distribution.PackageDescription.Parsec (readGenericPackageDescription)
 #endif
 import Distribution.Types.ComponentRequestedSpec (ComponentRequestedSpec(ComponentRequestedSpec))
+#if MIN_VERSION_Cabal(3,14,0)
+import Distribution.Simple.Utils (defaultPackageDescCwd, die', setupMessage)
+#else
 import Distribution.Simple.Utils (defaultPackageDesc, die', setupMessage)
+#endif
 import Distribution.System as Cabal (buildArch, Platform(..))
 import qualified Distribution.System as Cabal (buildOS)
 #if MIN_VERSION_Cabal(3,2,0)
@@ -54,7 +58,11 @@ inputCabalization flags =
         -- Load a GenericPackageDescription from the current directory
         -- and from that create a finalized PackageDescription for the
         -- given CompilerId.
+#if MIN_VERSION_Cabal(3,14,0)
+        genPkgDesc <- liftIO $ defaultPackageDescCwd vb >>= readGenericPackageDescription vb None
+#else
         genPkgDesc <- liftIO $ defaultPackageDesc vb >>= readGenericPackageDescription vb
+#endif
         let finalized = finalizePD (mkFlagAssignment (toList fs)) (ComponentRequestedSpec True False) (const True) (Platform buildArch Cabal.buildOS) cinfo [] genPkgDesc
         ePkgDesc <- either (return . Left)
                            (\ (pkgDesc, _) -> do liftIO $ bracket (setFileCreationMask 0o022) setFileCreationMask $ \ _ -> autoreconf vb pkgDesc
