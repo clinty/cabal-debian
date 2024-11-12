@@ -1,6 +1,6 @@
 cabal-version:  3.0
 Name:           cabal-debian
-Version:        5.2.4
+Version:        5.2.5
 Copyright:      Copyright (c) 2007-2014, David Fox, Jeremy Shaw; 2017-2024 Clint Adams
 License:        BSD-3-Clause
 License-File:   LICENSE
@@ -149,7 +149,7 @@ Library
   Build-Depends:
     base >= 4.17 && < 5,
     bifunctors,
-    Cabal >= 3.0,
+    Cabal >= 3.0 && < 3.15,
     containers,
     data-default,
     deepseq,
@@ -218,7 +218,7 @@ Executable cabal-debian
   Build-Depends:
     base >= 4.17 && <5,
     cabal-debian,
-    Cabal >= 3.0,
+    Cabal >= 3.0 && < 3.15,
     debian >= 3.95,
     lens,
     mtl,
@@ -233,7 +233,7 @@ Test-Suite cabal-debian-tests
   Build-Depends:
     base >= 4.17 && < 5,
     cabal-debian,
-    Cabal >= 3.0,
+    Cabal >= 3.0 && < 3.15,
     containers,
     debian >= 3.95,
     Diff >= 0.3.1 && < 2,
