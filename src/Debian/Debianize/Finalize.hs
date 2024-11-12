@@ -62,6 +62,9 @@ import System.FilePath ((<.>), (</>), makeRelative, splitFileName, takeDirectory
 import System.IO (hPutStrLn, stderr)
 import Text.Parsec.Rfc2822 (NameAddr(..))
 import Distribution.Pretty (Pretty(pretty))
+#if MIN_VERSION_Cabal(3,14,0)
+import Distribution.Utils.Path (interpretSymbolicPath)
+#endif
 
 -- | @debianize customize@ initializes the CabalT state from the
 -- environment and the cabal package description in (and possibly the
@@ -582,7 +585,12 @@ makeUtilsPackage pkgDesc hc =
            installedExec = Set.unions (Map.elems installedExecMap)
 
        prefixPath <- dataTop
-       let dataFilePaths = Set.fromList (zip (List.map (prefixPath </>) (Cabal.dataFiles pkgDesc)) (Cabal.dataFiles pkgDesc)) :: Set (FilePath, FilePath)
+#if MIN_VERSION_Cabal(3,14,0)
+       let dFpD = List.map (interpretSymbolicPath Nothing) (Cabal.dataFiles pkgDesc)
+#else
+       let dFpD = Cabal.dataFiles pkgDesc
+#endif
+           dataFilePaths = Set.fromList (zip (List.map (prefixPath </>) dFpD) dFpD) :: Set (FilePath, FilePath)
            execFilePaths :: Set FilePath
            execFilePaths = Set.map (unUnqualComponentName . Cabal.exeName) (Set.filter (Cabal.buildable . Cabal.buildInfo) (Set.fromList (Cabal.executables pkgDesc))) :: Set FilePath
        let availableData = Set.union installedData dataFilePaths
