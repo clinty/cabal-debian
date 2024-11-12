@@ -28,6 +28,7 @@ import Distribution.PackageDescription.Parsec (readGenericPackageDescription)
 import Distribution.Types.ComponentRequestedSpec (ComponentRequestedSpec(ComponentRequestedSpec))
 #if MIN_VERSION_Cabal(3,14,0)
 import Distribution.Simple.Utils (defaultPackageDescCwd, die', setupMessage)
+import Distribution.Utils.Path (relativeSymbolicPath)
 #else
 import Distribution.Simple.Utils (defaultPackageDesc, die', setupMessage)
 #endif
@@ -59,7 +60,7 @@ inputCabalization flags =
         -- and from that create a finalized PackageDescription for the
         -- given CompilerId.
 #if MIN_VERSION_Cabal(3,14,0)
-        genPkgDesc <- liftIO $ defaultPackageDescCwd vb >>= readGenericPackageDescription vb None
+        genPkgDesc <- liftIO $ defaultPackageDescCwd vb >>= readGenericPackageDescription vb Nothing . relativeSymbolicPath
 #else
         genPkgDesc <- liftIO $ defaultPackageDesc vb >>= readGenericPackageDescription vb
 #endif
