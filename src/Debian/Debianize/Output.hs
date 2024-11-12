@@ -1,6 +1,7 @@
 -- | Wrappers around the debianization function to perform various
 -- tasks - output, describe, validate a debianization, run an external
 -- script to produce a debianization.
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE FlexibleInstances, OverloadedStrings, ScopedTypeVariables, StandaloneDeriving, TupleSections, TypeSynonymInstances, RankNTypes #-}
 {-# OPTIONS -Wall -fno-warn-name-shadowing -fno-warn-orphans #-}
@@ -22,7 +23,11 @@ import Control.Lens
 import Control.Monad.Fail (MonadFail)
 import Control.Monad.State (get, put, StateT)
 import Control.Monad.Trans (liftIO, MonadIO)
+#if MIN_VERSION_Diff(1,0,0)
+import Data.Algorithm.DiffContext (getContextDiff, prettyContextDiff, unnumber)
+#else
 import Data.Algorithm.DiffContext (getContextDiff, prettyContextDiff)
+#endif
 import Data.Map as Map (elems, toList)
 import Data.Maybe (fromMaybe)
 import Data.Text as Text (split, Text, unpack)
@@ -171,7 +176,11 @@ compareDebianization old new =
       doFile path (Just o) (Just n) =
           if o == n
           then Nothing -- Just (path ++ ": Unchanged\n")
+#if MIN_VERSION_Diff(1,0,0)
+          else Just (show (prettyContextDiff (text ("old" </> path)) (text ("new" </> path)) (text . unpack . unnumber) (getContextDiff (Just 2) (split (== '\n') o) (split (== '\n') n))))
+#else
           else Just (show (prettyContextDiff (text ("old" </> path)) (text ("new" </> path)) (text . unpack) (getContextDiff 2 (split (== '\n') o) (split (== '\n') n))))
+#endif
       doFile _path Nothing Nothing = error "Internal error in zipMaps"
 
 -- | Make sure the new debianization matches the existing
