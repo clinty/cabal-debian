@@ -92,8 +92,7 @@ finalizeDebianization goodies =
     do date <- liftIO getCurrentLocalRFC822Time
        currentUser <- liftIO getCurrentDebianUser
        debhelperCompat <- liftIO getDebhelperCompatLevel
-       setupExists <- or <$> mapM (liftIO . doesFileExist) ["Setup.hs", "Setup.lhs"]
-       finalizeDebianization' goodies date currentUser debhelperCompat setupExists
+       finalizeDebianization' goodies date currentUser debhelperCompat
        vb <- use (A.debInfo . D.flags . verbosity)
        when (vb >= 3) (get >>= \ x -> liftIO (putStrLn ("\nFinalized Cabal Info: " ++ show x ++ "\n")))
        either (\e -> liftIO $ hPutStrLn stderr ("WARNING: " ++ e)) (\_ -> return ()) =<< use (A.debInfo . D.control . S.maintainer)
@@ -112,9 +111,8 @@ finalizeDebianization' ::
     -> String
     -> Maybe NameAddr
     -> Maybe Int
-    -> Bool
     -> CabalT m ()
-finalizeDebianization' goodies date currentUser debhelperCompat setupExists =
+finalizeDebianization' goodies date currentUser debhelperCompat =
     do -- In reality, hcs must be a singleton or many things won't work.  But some day...
        hc <- use (A.debInfo . D.flags . compilerFlavor)
        pkgDesc <- use A.packageDescription
@@ -125,8 +123,6 @@ finalizeDebianization' goodies date currentUser debhelperCompat setupExists =
          (True, D.TestsRun) -> (A.debInfo . D.rulesSettings) %= (++ ["DEB_ENABLE_TESTS = yes"])
          (True, D.TestsBuild) -> (A.debInfo . D.rulesSettings) %= (++ ["DEB_ENABLE_TESTS = yes", "DEB_BUILD_OPTIONS += nocheck"])
          _ -> return ()
-       (A.debInfo . D.rulesSettings) %=
-          (++ ["DEB_SETUP_BIN_NAME = " <> if setupExists then "debian/hlibrary.setup" else "cabal"])
  
        finalizeSourceName B.HaskellSource
        checkOfficialSettings hc
