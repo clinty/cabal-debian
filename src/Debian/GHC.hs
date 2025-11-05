@@ -165,7 +165,7 @@ compilerPackageName hc typ = do
             _ -> BinPkgName hcname
 
 compilerPackage :: CompilerFlavor -> IO (Maybe BinPkgName)
-compilerPackage GHC = filePackage "ghc" >>= runMemoized
+compilerPackage GHC = return $ Just (BinPkgName "ghc")
 compilerPackage GHCJS = filePackage "ghcjs" >>= runMemoized
 compilerPackage x = error $ "compilerPackage - unsupported CompilerFlavor: " ++ show x
 
