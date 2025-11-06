@@ -148,11 +148,9 @@ Library
   GHC-Options: -Wall
   Build-Depends:
     base >= 4.17 && < 5,
-    bifunctors,
     Cabal >= 3.0 && < 3.15,
     containers,
     data-default,
-    deepseq,
     Diff >= 0.3.1 && < 2,
     directory,
     exceptions,
@@ -217,12 +215,7 @@ Executable cabal-debian
   ghc-options: -threaded -Wall
   Build-Depends:
     base >= 4.17 && <5,
-    cabal-debian,
-    Cabal >= 3.0 && < 3.15,
-    debian >= 3.95,
-    lens,
-    mtl,
-    pretty >= 1.1.2
+    cabal-debian
 
 Test-Suite cabal-debian-tests
   Default-Language: Haskell2010
