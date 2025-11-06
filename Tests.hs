@@ -4,7 +4,11 @@ module Main where
 
 import Debian.Debianize.Optparse(_flags, parseProgramArguments)
 import Control.Lens
+#if MIN_VERSION_Diff(1,0,0)
+import Data.Algorithm.DiffContext (getContextDiff, prettyContextDiff, unnumber)
+#else
 import Data.Algorithm.DiffContext (getContextDiff, prettyContextDiff)
+#endif
 import Data.Bool (bool)
 import Data.Function (on)
 import Data.List (sortBy)
@@ -734,15 +738,28 @@ diffDebianizations old new =
       prettyChange (Deleted p _) = text "Deleted: " <> pPrint p <> text "\n"
       prettyChange (Created p b) =
           text "Created: " <> pPrint p <> text "\n" <>
+#if MIN_VERSION_Diff(1,0,0)
+          prettyContextDiff (text ("old" </> p)) (text ("new" </> p)) (text . unpack . unnumber)
+                     -- We use split here instead of lines so we can
+                     -- detect whether the file has a final newline
+                     -- character.
+                     (getContextDiff (Just 2) mempty (split (== '\n') b))
+#else
           prettyContextDiff (text ("old" </> p)) (text ("new" </> p)) (text . unpack)
                      -- We use split here instead of lines so we can
                      -- detect whether the file has a final newline
                      -- character.
                      (getContextDiff 2 mempty (split (== '\n') b))
+#endif
       prettyChange (Modified p a b) =
           text "Modified: " <> pPrint p <> text "\n" <>
+#if MIN_VERSION_Diff(1,0,0)
+          prettyContextDiff (text ("old" </> p)) (text ("new" </> p)) (text . unpack . unnumber)
+                     (getContextDiff (Just 2) (split (== '\n') a) (split (== '\n') b))
+#else
           prettyContextDiff (text ("old" </> p)) (text ("new" </> p)) (text . unpack)
                      (getContextDiff 2 (split (== '\n') a) (split (== '\n') b))
+#endif
 
 sortBinaryDebs :: DebianT IO ()
 sortBinaryDebs = (D.control . S.binaryPackages) %= sortBy (compare `on` view B.package)
