@@ -37,7 +37,7 @@ Build-Depends: debhelper (>= 9)
                , libghc-web-plugins-prof (<< 0.2)
 Standards-Version: 3.9.6
 Homepage: http://www.clckwrks.com/
-X-Description: clckwrks.com
+Description: clckwrks.com
 
 Package: clckwrks-dot-com-production
 Architecture: any
