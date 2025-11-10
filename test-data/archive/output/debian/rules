@@ -1,9 +1,4 @@
 #!/usr/bin/make -f
 
-DEB_CABAL_PACKAGE = seereason-darcs-backups
-DEB_DEFAULT_COMPILER = ghc
-
 %:
 	dh $@
-
-build/seereason-darcs-backups:: build-ghc-stamp

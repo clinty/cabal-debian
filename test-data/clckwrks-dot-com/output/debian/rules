@@ -1,13 +1,9 @@
 #!/usr/bin/make -f
 
-DEB_SETUP_GHC_CONFIGURE_ARGS = -fbackups
-DEB_CABAL_PACKAGE = clckwrks-dot-com
-DEB_DEFAULT_COMPILER = ghc
+export DEB_SETUP_GHC_CONFIGURE_ARGS = -fbackups
 
 %:
 	dh $@
-
-build/haskell-clckwrks-dot-com-utils:: build-ghc-stamp
 
 binary-fixup/clckwrks-dot-com-production::
 	echo -n 'haskell:Depends=' >> debian/clckwrks-dot-com-production.substvars

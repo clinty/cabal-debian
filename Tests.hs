@@ -443,7 +443,7 @@ test4 label =
       serverNames = map BinPkgName ["clckwrks-dot-com-production"] -- , "clckwrks-dot-com-staging", "clckwrks-dot-com-development"]
       -- Insert a line just above the debhelper.mk include
       fixRules =
-          (debInfo . D.rulesSettings) %= (++ ["DEB_SETUP_GHC_CONFIGURE_ARGS = -fbackups"])
+          (debInfo . D.rulesSettings) %= (++ ["export DEB_SETUP_GHC_CONFIGURE_ARGS = -fbackups"])
 {-
           mapAtoms f deb
           where
@@ -451,7 +451,7 @@ test4 label =
             f Source (DebRulesHead t) =
                 singleton (Source, DebRulesHead (T.unlines $ concat $
                                                  map (\ line -> if line == "include /usr/share/cdbs/1/rules/debhelper.mk"
-                                                                then ["DEB_SETUP_GHC_CONFIGURE_ARGS = -fbackups", "", line] :: [T.Text]
+                                                                then ["export DEB_SETUP_GHC_CONFIGURE_ARGS = -fbackups", "", line] :: [T.Text]
                                                                 else [line] :: [T.Text]) (T.lines t)))
             f k a = singleton (k, a)
 -}
