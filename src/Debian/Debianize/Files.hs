@@ -52,7 +52,6 @@ debianizationFileMap =
        tell =<< control
        tell =<< changelog
        tell =<< rules
-       tell =<< compat
        tell =<< copyright
        tell =<< sourceFormatFiles
        tell =<< watchFile
@@ -157,11 +156,6 @@ control :: (Monad m) => FilesT m [(FilePath, Text)]
 control =
     do d <- lift $ use D.control
        return [("debian/control", prettyText (controlFile d))]
-
-compat :: (Monad m) => FilesT m [(FilePath, Text)]
-compat =
-    do t <- lift $ use D.compat
-       return [("debian/compat", pack (show (fromMaybe (error "Missing DebCompat atom - is debhelper installed?") $ t) <> "\n"))]
 
 copyright :: (Monad m) => FilesT m [(FilePath, Text)]
 copyright =

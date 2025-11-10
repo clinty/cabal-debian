@@ -422,7 +422,7 @@ test4 label =
              (A.debInfo . D.missingDependencies) %= Set.insert (BinPkgName "libghc-clckwrks-theme-clckwrks-doc")
              (A.debInfo . D.sourceFormat) .= Native3
              (A.debInfo . D.control . S.homepage) .= Just "http://www.clckwrks.com/"
-             newDebianization' (Just 9) (Just (StandardsVersion 3 9 6 Nothing))
+             newDebianization' (Just 13) (Just (StandardsVersion 3 9 6 Nothing))
 {-
       customize log = modifyM (lift . customize' log)
       customize' :: Maybe ChangeLog -> CabalInfo -> IO CabalInfo
@@ -694,7 +694,7 @@ test10 label =
           do (A.debInfo . D.flags . verbosity) .= 1
              (A.debInfo . D.sourceFormat) .= Native3
              (A.debInfo . D.sourcePackageName) .= Just (SrcPkgName "seereason-darcs-backups")
-             (A.debInfo . D.compat) .= Just 9
+             (A.debInfo . D.compat) .= Just 13
              (A.debInfo . D.control . S.standardsVersion) .= Just (StandardsVersion 3 8 1 Nothing)
              (A.debInfo . D.control . S.maintainer) .= parseMaintainer "David Fox <dsf@seereason.com>"
              (A.debInfo . D.binaryDebDescription (BinPkgName "seereason-darcs-backups") . B.relations . B.depends) %= (++ [[Rel (BinPkgName "anacron") Nothing Nothing]])
