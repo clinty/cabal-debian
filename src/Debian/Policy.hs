@@ -115,8 +115,8 @@ debianPackageVersion name =
       parseDebianVersion'' "" = Nothing
       parseDebianVersion'' s = Just (parseDebianVersion' s)
 
--- | With the current state of CDBS, anything above 10 breaks, so
--- for now we force this to 10.
+-- | 13 is the current usual compat level
+-- see https://trends.debian.net/.
 getDebhelperCompatLevel :: IO (Maybe Int)
 getDebhelperCompatLevel = return (Just 13)
 
