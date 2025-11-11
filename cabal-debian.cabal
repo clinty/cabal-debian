@@ -163,7 +163,7 @@ Library
     unliftio >= 0.2.8.0,
     utf8-string,
     optparse-applicative >= 0.11 && < 0.20,
-    ansi-wl-pprint >= 0.6 && < 1.1,
+    prettyprinter,
     debian >= 3.95
   Exposed-Modules:
     Data.Maybe.Extended

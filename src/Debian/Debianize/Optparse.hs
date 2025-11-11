@@ -43,7 +43,7 @@ import System.Environment (getArgs)
 import System.FilePath(splitFileName, (</>))
 import System.Process (showCommandForUser)
 import Text.Parsec.Rfc2822 (NameAddr(..))
-import Text.PrettyPrint.ANSI.Leijen (linebreak, (<+>), string, indent)
+import Prettyprinter ((<+>), flatAlt, indent, line, pretty)
 import qualified  Debian.Debianize.DebInfo as D
 import qualified Data.Map as Map
 import qualified Data.Set as Set
@@ -582,7 +582,7 @@ commandLineOptionsParserInfo args = O.info (O.helper <*> commandLineOptionsP) im
     <+> linebreak <+> linebreak
     <+> indent 2 "% cabal-debian  --maintainer 'Maintainer Name <maintainer@email>'"
     <+> linebreak <+> linebreak
-    <+> (string . unlines $ [
+    <+> (pretty . unlines $ [
      "This will read the package's cabal file and any existing debian/changelog file and",
      "deduce what it can about the debianization, then it will create or modify files in",
      "the debian subdirectory.  Note that it will not remove any files in debian, and",
@@ -592,6 +592,7 @@ commandLineOptionsParserInfo args = O.info (O.helper <*> commandLineOptionsP) im
      "",
      "Arguments: " ++ showCommandForUser "cabal-debian" args
      ])
+  linebreak = flatAlt line mempty
 
 -- FIXME: Separation of parsing of `BehaviorAdjustment' and performing
 -- of corresponding actions is all great, but now it is pretty easy
