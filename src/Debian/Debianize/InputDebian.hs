@@ -278,7 +278,7 @@ readLink p line =
 readInstall :: Monad m => BinPkgName -> Text -> DebianT m ()
 readInstall p line =
     case break isSpace line of
-      (_, b) | null b -> error $ "readInstall: syntax error in .install file for " ++ show p ++ ": " ++ show line
+      (a, b) | null b -> install p (unpack (strip a)) (unpack (strip a))
       (a, b) -> install p (unpack (strip a)) (unpack (strip b))
 
 -- | Read a line from a debian .dirs file
