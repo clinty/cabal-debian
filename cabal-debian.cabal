@@ -22,7 +22,6 @@ Extra-Source-Files:
   debian/cabal-debian.1
   debian/cabal-debian.install
   debian/cabal-debian.manpages
-  debian/compat
   debian/control
   debian/copyright
   debian/Debianize.hs
@@ -46,7 +45,6 @@ Extra-Source-Files:
   test-data/creativeprompts/output/debian/creativeprompts-backups.postinst
   test-data/creativeprompts/output/debian/creativeprompts-production.dirs
   test-data/creativeprompts/output/debian/rules
-  test-data/creativeprompts/output/debian/compat
   test-data/creativeprompts/output/debian/source/format
   test-data/creativeprompts/output/debian/control
   test-data/creativeprompts/output/debian/creativeprompts-data.install
@@ -68,7 +66,6 @@ Extra-Source-Files:
   test-data/haskell-devscripts/debian/changelog
   test-data/haskell-devscripts/debian/install
   test-data/haskell-devscripts/debian/rules
-  test-data/haskell-devscripts/debian/compat
   test-data/haskell-devscripts/debian/dirs
   test-data/haskell-devscripts/debian/source/format
   test-data/haskell-devscripts/debian/control
@@ -80,7 +77,6 @@ Extra-Source-Files:
   test-data/alex/output/debian/alex.install
   test-data/alex/output/debian/changelog
   test-data/alex/output/debian/rules
-  test-data/alex/output/debian/compat
   test-data/alex/output/debian/source/format
   test-data/alex/output/debian/control
   test-data/alex/output/debian/copyright
@@ -92,7 +88,6 @@ Extra-Source-Files:
   test-data/artvaluereport-data/output/debian/changelog
   test-data/artvaluereport-data/output/debian/Debianize.hs
   test-data/artvaluereport-data/output/debian/rules
-  test-data/artvaluereport-data/output/debian/compat
   test-data/artvaluereport-data/output/debian/source/format
   test-data/artvaluereport-data/output/debian/control
   test-data/artvaluereport-data/output/debian/copyright
@@ -128,7 +123,6 @@ Extra-Source-Files:
   test-data/artvaluereport2/output/debian/artvaluereport2-production.init
   test-data/artvaluereport2/output/debian/artvaluereport2-production.dirs
   test-data/artvaluereport2/output/debian/rules
-  test-data/artvaluereport2/output/debian/compat
   test-data/artvaluereport2/output/debian/appraisalscope.install
   test-data/artvaluereport2/output/debian/control
   test-data/artvaluereport2/output/debian/artvaluereport2-backups.install
