@@ -60,7 +60,6 @@ Extra-Source-Files:
   test-data/clckwrks-dot-com/output/debian/changelog
   test-data/clckwrks-dot-com/output/debian/Debianize.hs
   test-data/clckwrks-dot-com/output/debian/rules
-  test-data/clckwrks-dot-com/output/debian/compat
   test-data/clckwrks-dot-com/output/debian/source/format
   test-data/clckwrks-dot-com/output/debian/control
   test-data/clckwrks-dot-com/output/debian/copyright
@@ -103,7 +102,6 @@ Extra-Source-Files:
   test-data/archive/output/debian/watch
   test-data/archive/output/debian/changelog
   test-data/archive/output/debian/rules
-  test-data/archive/output/debian/compat
   test-data/archive/output/debian/control
   test-data/archive/output/debian/seereason-darcs-backups.install
   test-data/archive/output/debian/copyright

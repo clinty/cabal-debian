@@ -155,10 +155,10 @@ debianBuildDeps pkgDesc =
        ghcprof <- liftIO $ compilerPackageName hflavor B.Profiling
        let ghcrel = if member GHC hcs then maybe [] ((: []) . anyrel') ghcdev else []
        let ghcrelprof = if prof then maybe [] ((: []) . anyrel') ghcprof else []
-       let xs = nub $ [maybe [] (\ n -> [D.Rel (D.BinPkgName "debhelper") (Just (D.GRE (parseDebianVersion' (show n)))) Nothing]) compat,
+       let xs = nub $ [maybe [] (\ n -> [D.Rel (D.BinPkgName "debhelper-compat") (Just (D.EEQ (parseDebianVersion' (show n)))) Nothing]) compat,
                        [D.Rel (D.BinPkgName "haskell-devscripts-minimal") Nothing Nothing,
-                        D.Rel (D.BinPkgName "haskell-devscripts") (Just $ D.GRE $ parseDebianVersion' ("0.13" :: String)) Nothing],
-                       anyrel "cdbs"] ++
+                        D.Rel (D.BinPkgName "haskell-devscripts") (Just $ D.GRE $ parseDebianVersion' ("0.16.42" :: String)) Nothing],
+                       anyrel "dh-sequence-haskell"] ++
                       (ghcrel ++ ghcrelprof) ++
                        bDeps ++
                        cDeps

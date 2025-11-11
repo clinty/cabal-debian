@@ -120,8 +120,8 @@ finalizeDebianization' goodies date currentUser debhelperCompat =
        testsStatus <- use (A.debInfo . D.testsStatus)
        let testsExist = not $ List.null $ Cabal.testSuites pkgDesc
        case (testsExist, testsStatus) of
-         (True, D.TestsRun) -> (A.debInfo . D.rulesSettings) %= (++ ["DEB_ENABLE_TESTS = yes"])
-         (True, D.TestsBuild) -> (A.debInfo . D.rulesSettings) %= (++ ["DEB_ENABLE_TESTS = yes", "DEB_BUILD_OPTIONS += nocheck"])
+         (True, D.TestsRun) -> (A.debInfo . D.rulesSettings) %= (++ ["export DEB_ENABLE_TESTS = yes"])
+         (True, D.TestsBuild) -> (A.debInfo . D.rulesSettings) %= (++ ["export DEB_ENABLE_TESTS = yes", "export DEB_BUILD_OPTIONS += nocheck"])
          _ -> return ()
  
        finalizeSourceName B.HaskellSource
@@ -315,7 +315,7 @@ finalizeControl currentUser =
        Just src <- use (A.debInfo . D.sourcePackageName)
        (A.debInfo . D.control . S.source) .= Just src
        desc' <- describe
-       (A.debInfo . D.control . S.xDescription) .?= Just desc'
+       (A.debInfo . D.control . S.sourceDescription) .?= Just desc'
        -- control %= (\ y -> y { D.source = Just src, D.maintainer = Just maint })
 
 describe :: Monad m => CabalT m Text
@@ -612,7 +612,6 @@ makeUtilsPackage pkgDesc hc =
        when (not (Set.null utilsData && Set.null utilsExec)) $ do
          (A.debInfo . D.binaryDebDescription b . B.description) .?= Just desc
          -- This is really for all binary debs except the libraries - I'm not sure why
-         (A.debInfo . D.rulesFragments) %= Set.insert (pack ("build" </> ppShow b ++ ":: build-ghc-stamp\n"))
          (A.debInfo . D.binaryDebDescription b . B.architecture) .?= Just (if Set.null utilsExec then All else Any)
          (A.debInfo . D.binaryDebDescription b . B.binarySection) .?= Just (MainSection "misc")
          binaryPackageRelations b B.Utilities
@@ -747,12 +746,10 @@ finalizeRules =
        cpn <- liftIO $ compilerPackageName hc B.Development
        let BinPkgName hcdeb = fromMaybe (error "No compiler package") cpn
        (A.debInfo . D.rulesHead) .?= Just "#!/usr/bin/make -f"
-       (A.debInfo . D.rulesSettings) %= (++ ["DEB_CABAL_PACKAGE = " <> pack b])
-       (A.debInfo . D.rulesSettings) %= (++ ["DEB_DEFAULT_COMPILER = " <> pack hcdeb])
        flags <- flagString . Set.toList <$> use (A.debInfo . D.flags . cabalFlagAssignments)
-       unless (List.null flags) ((A.debInfo . D.rulesSettings) %= (++ ["DEB_SETUP_GHC_CONFIGURE_ARGS = " <> pack flags]))
-       (A.debInfo . D.rulesIncludes) %= (++ ["include /usr/share/cdbs/1/rules/debhelper.mk",
-                                             "include /usr/share/cdbs/1/class/hlibrary.mk"])
+       unless (List.null flags) ((A.debInfo . D.rulesSettings) %= (++ ["export DEB_SETUP_GHC_CONFIGURE_ARGS = " <> pack flags]))
+       (A.debInfo . D.rulesIncludes) %= (++ ["%:",
+                                             "\tdh $@"])
 
 data Dependency_
   = BuildDepends Dependency

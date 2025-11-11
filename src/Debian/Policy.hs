@@ -118,7 +118,7 @@ debianPackageVersion name =
 -- | With the current state of CDBS, anything above 10 breaks, so
 -- for now we force this to 10.
 getDebhelperCompatLevel :: IO (Maybe Int)
-getDebhelperCompatLevel = return (Just 10)
+getDebhelperCompatLevel = return (Just 13)
 
 data StandardsVersion = StandardsVersion Int Int Int (Maybe Int) deriving (Eq, Ord, Show, Data, Typeable)
 

@@ -2,9 +2,9 @@ Source: haskell-clckwrks-dot-com
 Maintainer: Jeremy Shaw <jeremy@n-heptane.com>
 Priority: optional
 Section: haskell
-Build-Depends: debhelper (>= 9)
-               , haskell-devscripts-minimal | haskell-devscripts (>= 0.13)
-               , cdbs
+Build-Depends: debhelper-compat (= 13)
+               , haskell-devscripts-minimal | haskell-devscripts (>= 0.16.42)
+               , dh-sequence-haskell
                , ghc
                , ghc-prof
                , libghc-clckwrks-dev (>= 0.13)
@@ -37,7 +37,7 @@ Build-Depends: debhelper (>= 9)
                , libghc-web-plugins-prof (<< 0.2)
 Standards-Version: 3.9.6
 Homepage: http://www.clckwrks.com/
-X-Description: clckwrks.com
+Description: clckwrks.com
 
 Package: clckwrks-dot-com-production
 Architecture: any
