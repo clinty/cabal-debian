@@ -156,7 +156,7 @@ compilerPackageName hc typ = do
           case (hc, typ, isDebian) of
             -- Debian puts the .haddock files in ghc-doc
             (GHC, Documentation, True) -> BinPkgName (hcname ++ "-doc")
-            -- In HVR repo the .haddock files required to buid html
+            -- In HVR repo the .haddock files required to build html
             -- are in the main compiler package.  However, the html
             -- files in ghc-<version>-htmldocs are also needed to
             -- create links.

@@ -76,7 +76,7 @@ module Debian.Debianize
     , module Debian.Debianize.CabalInfo
       -- * State monads to carry the collected information, command line options
     , module Debian.Debianize.Monad
-      -- * Functions for maping Cabal name and version number to Debian name
+      -- * Functions for mapping Cabal name and version number to Debian name
     , module Debian.Debianize.DebianName
       -- * Specific details about the particular packages and versions in the Debian repo
     , module Debian.Debianize.Details

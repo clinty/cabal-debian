@@ -95,7 +95,7 @@ flagOptions =
       Option "" ["upgrade"] (NoArg (upgrade .= True))
              "Carefully upgrade an existing debianization",
       Option "" ["roundtrip"] (NoArg (roundtrip .= True))
-             "Rountrip a debianization to normalize it",
+             "Roundtrip a debianization to normalize it",
       Option "" ["ghc"] (NoArg (compilerFlavor .= GHC)) "Generate packages for GHC - same as --with-compiler GHC",
       Option "" ["ghcjs"] (NoArg (compilerFlavor .= GHCJS)) "Generate packages for GHCJS - same as --with-compiler GHCJS",
       Option "" ["hugs"] (NoArg (compilerFlavor .= Hugs)) "Generate packages for Hugs - same as --with-compiler GHC",

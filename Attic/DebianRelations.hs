@@ -66,7 +66,7 @@ ofFormula form =
       na (Rel name (Just (SGR v)) arch) = Rel name (Just (LTE v)) arch
       na (Rel name (Just (GRE v)) arch) = Rel name (Just (SLT v)) arch
       na (Rel name (Just (LTE v)) arch) = Rel name (Just (SGR v)) arch
-      na _ = error $ "Unexepected na"
+      na _ = error $ "Unexpected na"
 
 {-
 instance Negatable Relations where

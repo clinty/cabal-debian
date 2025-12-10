@@ -93,7 +93,7 @@ performDebianizationWith goodies custom =
   parseProgramArguments >>= \CommandLineOptions {..} -> do
     -- _ <- try (readProcessWithExitCode "apt-get" ["install", "-y", "--force-yes", hcDeb (view compilerFlavor _flags)] "")
     newCabalInfo _flags >>= either
-                               (error . ("peformDebianization - " ++))
+                               (error . ("performDebianization - " ++))
                                (evalCabalT $ do
                                 handleBehaviorAdjustment _adjustment
                                 debianizeWith goodies custom

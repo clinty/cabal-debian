@@ -172,7 +172,7 @@ haskell-artvaluereport-data (1.52) unstable; urgency=low
 
 haskell-artvaluereport-data (1.51) unstable; urgency=low
 
-  * Add a UUID field which will serve as a permenant identifier for the
+  * Add a UUID field which will serve as a permanent identifier for the
     report across all the servers we might create to handle these reports.
   * Add report archiving and unarchiving.
   * Add an event to replace a report by UUID number.
