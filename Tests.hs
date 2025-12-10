@@ -796,7 +796,7 @@ main = do
             else ExitSuccess
 
 
--- Cusstom HUnit assertion, which prints the diffs without using 'show'
+-- Custom HUnit assertion, which prints the diffs without using 'show'
 assertEmptyDiff :: String -- ^ The message prefix
                 -> String -- ^ The actual diff
                 -> Assertion

@@ -104,7 +104,7 @@ finalizeDebianization goodies =
 -- debianization in other ways, so be careful not to do this twice,
 -- this function is not idempotent.  (Exported for use in unit tests.)
 -- FIXME: we should be able to run this without a PackageDescription, change
---        paramter type to Maybe PackageDescription and propagate down thru code
+--        parameter type to Maybe PackageDescription and propagate down thru code
 finalizeDebianization' ::
     (MonadIO m, MonadFail m)
     => CabalT m ()
@@ -136,7 +136,7 @@ finalizeDebianization' goodies date currentUser debhelperCompat =
        finalizeRules
        -- T.license .?= Just (Cabal.license pkgDesc)
        expandAtoms goodies
-       -- Create the binary packages for the web sites, servers, backup packges, and other executables
+       -- Create the binary packages for the web sites, servers, backup packages, and other executables
        use (A.debInfo . D.executable) >>= List.mapM_ (cabalExecBinaryPackage . fst) . Map.toList
        use (A.debInfo . D.backups) >>= List.mapM_ (cabalExecBinaryPackage . fst) . Map.toList
        use (A.debInfo . D.serverInfo) >>= List.mapM_ (cabalExecBinaryPackage . fst) . Map.toList
@@ -427,7 +427,7 @@ finalizeChangelog date currentUser =
           Just (ChangeLog (entry : maybe [] (\ (ChangeLog entries) -> entries) log))
 
 -- | Convert the extraLibs field of the cabal build info into debian
--- binary package names and make them dependendencies of the debian
+-- binary package names and make them dependencies of the debian
 -- devel package (if there is one.)
 addExtraLibDependencies :: (Monad m) => CompilerFlavor -> CabalT m ()
 addExtraLibDependencies hc =

@@ -533,7 +533,7 @@ haskell-cabal-debian (4.16.1) unstable; urgency=low
 
   * Support for packaging libraries produced by the GHCJS compiler.
   * Generate debianizations that include libraries for multiple compiler
-    flavors (not yet suppored in haskell-devscripts and/or Cabal.)
+    flavors (not yet supported in haskell-devscripts and/or Cabal.)
   * Put a DEB_DEFAULT_COMPILER assignment in debian/rules if we can
     infer it from the command line options.
 
@@ -1405,7 +1405,7 @@ haskell-cabal-debian (1.6) unstable; urgency=low
 
   * Don't omit dependencies built into ghc, they should be satisfied by
     the Provides in the compiler if they are not available in the
-    repository.  However, we do need to make ghc an alterantive to any
+    repository.  However, we do need to make ghc an alternative to any
     versioned dependencies that are bundled with the compiler, since the
     built in dependencies are virtual packages and thus unversioned.
 
