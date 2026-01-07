@@ -1,6 +1,6 @@
 cabal-version:  3.0
 Name:           cabal-debian
-Version:        5.4.2
+Version:        5.4.3
 Copyright:      Copyright (c) 2007-2014, David Fox, Jeremy Shaw; 2017-2026 Clint Adams
 License:        BSD-3-Clause
 License-File:   LICENSE
