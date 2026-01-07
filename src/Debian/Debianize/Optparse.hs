@@ -393,7 +393,7 @@ mkExtraP long@(c:cr) = many $ O.option (view _Unwrapped <$> extraRelationsR) m w
     m = O.help helpMsg
         <> O.long long
         <> O.metavar "DEB:RELATION"
-    helpMsg = "Add extry to '" ++ fieldName ++ " 'field of DEB binary package"
+    helpMsg = "Add entry to '" ++ fieldName ++ " 'field of DEB binary package"
 mkExtraP "" = error "mkExtraP: empty long option"
 
 extraDependsP :: O.Parser [ExtraDepends]

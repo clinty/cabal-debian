@@ -289,7 +289,7 @@ parseUploaders x =
     -- either (\ e -> error ("Failure parsing uploader list: " ++ show x ++ " -> " ++ show e)) id $ 
     where
       fixWhite c = if isSpace c then ' ' else c
-      -- We absoletely need a name.
+      -- We absolutely need a name.
       fixNameAddrs :: [NameAddr] -> Either String [NameAddr]
       fixNameAddrs xs = case mapMaybe fixNameAddr xs of
                           [] -> Left ("No valid debian maintainers in " ++ show x)
