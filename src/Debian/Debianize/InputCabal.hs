@@ -20,6 +20,9 @@ import Distribution.Compiler (CompilerInfo)
 import Distribution.Package (Package(packageId))
 import Distribution.PackageDescription as Cabal (PackageDescription)
 import Distribution.PackageDescription.Configuration (finalizePD)
+#if MIN_VERSION_Cabal(3,16,0)
+import Distribution.Types.DependencySatisfaction (DependencySatisfaction(Satisfied))
+#endif
 #if MIN_VERSION_Cabal(3,8,1)
 import Distribution.Simple.PackageDescription (readGenericPackageDescription)
 #else
@@ -64,7 +67,7 @@ inputCabalization flags =
 #else
         genPkgDesc <- liftIO $ defaultPackageDesc vb >>= readGenericPackageDescription vb
 #endif
-        let finalized = finalizePD (mkFlagAssignment (toList fs)) (ComponentRequestedSpec True False) (const True) (Platform buildArch Cabal.buildOS) cinfo [] genPkgDesc
+        let finalized = finalizePD (mkFlagAssignment (toList fs)) (ComponentRequestedSpec True False) (const satisfied) (Platform buildArch Cabal.buildOS) cinfo [] genPkgDesc
         ePkgDesc <- either (return . Left)
                            (\ (pkgDesc, _) -> do liftIO $ bracket (setFileCreationMask 0o022) setFileCreationMask $ \ _ -> autoreconf vb pkgDesc
                                                  return (Right pkgDesc))
@@ -75,6 +78,11 @@ inputCabalization flags =
                ePkgDesc
       vb = intToVerbosity' $ view verbosity flags
       fs = view cabalFlagAssignments flags
+#if MIN_VERSION_Cabal(3,16,0)
+      satisfied = Satisfied
+#else
+      satisfied = True
+#endif
 
 getCompInfo :: MonadIO m => Flags -> m (Either String CompilerInfo)
 getCompInfo flags =
