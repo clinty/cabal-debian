@@ -48,9 +48,11 @@ import Control.Arrow (second)
 import Control.Monad (mplus)
 import Data.Char (isSpace, toLower)
 import Data.Generics (Data, Typeable)
-import Data.List (groupBy, intercalate)
+import Data.List (groupBy)
 import Data.Maybe (fromMaybe, mapMaybe)
 import Data.Text (pack, strip, Text, unpack)
+import Debian.Arch (parseArch, prettyArch)
+import qualified Debian.Arch as Arch
 import Debian.Debianize.Prelude (read')
 import Debian.Pretty (PP(..))
 import Debian.Relation (BinPkgName)
@@ -64,7 +66,7 @@ import System.FilePath ((</>))
 import System.Process (readProcess)
 import Text.Parsec (parse)
 import Text.Parsec.Rfc2822 (address, NameAddr(..))
-import Text.PrettyPrint.HughesPJClass (text)
+import Text.PrettyPrint.HughesPJClass (text, (<+>))
 import Distribution.Pretty (Pretty(pretty))
 import Text.Read (readMaybe)
 
@@ -181,20 +183,21 @@ instance Pretty (PP PackagePriority) where
 
 -- | The architectures for which a binary deb can be built.
 data PackageArchitectures
-    = All            -- ^ The package is architecture independenct
-    | Any            -- ^ The package can be built for any architecture
-    | Names [String] -- ^ The list of suitable architectures
+    = All               -- ^ The package is architecture independenct
+    | Any               -- ^ The package can be built for any architecture
+    | Names [Arch.Arch] -- ^ The list of suitable architectures
     deriving (Read, Eq, Ord, Show, Data, Typeable)
 
 instance Pretty (PP PackageArchitectures) where
     pretty (PP All) = text "all"
     pretty (PP Any) = text "any"
-    pretty (PP (Names xs)) = text $ intercalate " " xs
+    pretty (PP (Names xs)) = foldr ((<+>) . prettyArch) mempty xs
 
 parsePackageArchitectures :: String -> PackageArchitectures
 parsePackageArchitectures "all" = All
 parsePackageArchitectures "any" = Any
-parsePackageArchitectures s = error $ "FIXME: parsePackageArchitectures " ++ show s
+parsePackageArchitectures "source" = error $ "'source' does not make sense here"
+parsePackageArchitectures s = Names . map parseArch . words $ s
 
 data Section
     = MainSection String -- Equivalent to AreaSection Main s?
