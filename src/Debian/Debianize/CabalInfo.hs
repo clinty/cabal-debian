@@ -36,9 +36,7 @@ import Debian.Relation (BinPkgName)
 import Debian.Version (DebianVersion)
 import Distribution.Package (PackageName)
 import Distribution.PackageDescription as Cabal (PackageDescription(homepage))
-#if MIN_VERSION_Cabal(3,2,0)
 import qualified Distribution.Utils.ShortText as ST
-#endif
 import Prelude hiding (init, init, log, log, null)
 
 -- | Bits and pieces of information about the mapping from cabal package
@@ -88,11 +86,7 @@ newCabalInfo flags' =
                                                     x | Text.null x -> Nothing
                                                     x -> Just x)
           (makeCabalInfo flags' pkgDesc)
-#if MIN_VERSION_Cabal(3,2,0)
       toText = pack . ST.fromShortText
-#else
-      toText = pack
-#endif
 
 makeCabalInfo :: Flags -> PackageDescription -> CabalInfo
 makeCabalInfo fs pkgDesc =

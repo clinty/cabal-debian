@@ -140,7 +140,7 @@ Library
   GHC-Options: -Wall
   Build-Depends:
     base >= 4.17 && < 5,
-    Cabal >= 3.0 && < 3.17,
+    Cabal >= 3.2 && < 3.17,
     containers,
     data-default,
     Diff >= 0.3.1 && < 2,
@@ -218,7 +218,7 @@ Test-Suite cabal-debian-tests
   Build-Depends:
     base >= 4.17 && < 5,
     cabal-debian,
-    Cabal >= 3.0 && < 3.17,
+    Cabal >= 3.2 && < 3.17,
     containers,
     debian >= 3.95,
     Diff >= 0.3.1 && < 2,

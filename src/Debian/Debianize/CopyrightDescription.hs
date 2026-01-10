@@ -52,9 +52,7 @@ import Debug.Trace
 import qualified Distribution.License as Cabal (License(UnknownLicense))
 import qualified Distribution.Package as Cabal
 import qualified Distribution.PackageDescription as Cabal (PackageDescription(licenseFiles, copyright, licenseRaw, package, maintainer))
-#if MIN_VERSION_Cabal(3,2,0)
 import qualified Distribution.Utils.ShortText as ST
-#endif
 #if MIN_VERSION_Cabal(3,6,0)
 import qualified Distribution.Utils.Path as DUP
 #endif
@@ -292,11 +290,7 @@ defaultCopyrightDescription pkgDesc = do
             }
   where
     toText =
-#if MIN_VERSION_Cabal(3,2,0)
         pack . ST.fromShortText
-#else
-        pack
-#endif
 
 {-
   -- We don't really have a way to associate licenses with
