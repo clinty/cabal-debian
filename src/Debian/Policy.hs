@@ -316,7 +316,10 @@ parseMaintainer x =
 -- | Maintainer is a mandatory field, so we need a value we can use
 -- when all else fails.
 maintainerOfLastResort :: NameAddr
-Right maintainerOfLastResort = parseMaintainer "nobody <nobody@nowhere>"
+maintainerOfLastResort =
+    case parseMaintainer "nobody <nobody@nowhere>" of
+        Left _ -> error "fatal error in parseMaintainer"
+        Right na -> na
 
 -- | Official Debian license types as described in
 -- <https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/#license-specification>.

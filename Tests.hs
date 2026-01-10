@@ -645,7 +645,9 @@ test9 label =
                  new <- withCurrentDirectory inTop $
                         newFlags >>= newCabalInfo >>=
                         either (error "test9 - newCabalInfo failed") (execCabalT (debianize (defaultAtoms >> customize)))
-                 let Just (ChangeLog (entry : _)) = view (debInfo . D.changelog) new
+                 let entry = case view (debInfo . D.changelog) new of
+                                 Just (ChangeLog (x : _)) -> x
+                                 _ -> error "unexpected changelog"
                  old <- withCurrentDirectory outTop $ newFlags >>= execDebianT (inputDebianization >> copyChangelogDate (logDate entry)) . D.makeDebInfo
                  diff <- diffDebianizations old (view debInfo new)
                  assertEmptyDiff label diff)
@@ -683,7 +685,9 @@ test10 label =
     TestCase (do let inTop = "test-data/archive/input"
                      outTop = "test-data/archive/output"
                  old <- withCurrentDirectory outTop $ newFlags >>= execDebianT inputDebianization . D.makeDebInfo
-                 let Just (ChangeLog (entry : _)) = view D.changelog old
+                 let entry = case view D.changelog old of
+                                 Just (ChangeLog (x : _)) -> x
+                                 _ -> error "unexpected changelog"
                  new <- withCurrentDirectory inTop $
                         newFlags >>= newCabalInfo >>= react entry
                  diff <- diffDebianizations old (view debInfo new)
@@ -707,7 +711,10 @@ test10 label =
 
 copyChangelogDate :: Monad m => String -> DebianT m ()
 copyChangelogDate date =
-    D.changelog %= (\ (Just (ChangeLog (entry : older))) -> Just (ChangeLog (entry {logDate = date} : older)))
+    D.changelog %= (mapped %~ substDate)
+    where
+        substDate (ChangeLog (entry : older)) = ChangeLog (entry {logDate = date} : older)
+        substDate (ChangeLog []) = ChangeLog []
 
 data Change k a
     = Created k a

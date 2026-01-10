@@ -29,7 +29,7 @@ import Data.Algorithm.DiffContext (getContextDiff, prettyContextDiff, unnumber)
 import Data.Algorithm.DiffContext (getContextDiff, prettyContextDiff)
 #endif
 import Data.Map as Map (elems, toList)
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, fromJust)
 import Data.Text as Text (split, Text, unpack)
 import Debian.Debianize.CabalInfo (newCabalInfo)
 import Debian.Changes (ChangeLog(..), ChangeLogEntry(..))
@@ -166,8 +166,8 @@ mergeDebianization old new =
 -- describing the differences.
 compareDebianization :: D.DebInfo -> D.DebInfo -> [String]
 compareDebianization old new =
-    let ~(Just oldFiles) = evalDebianT debianizationFileMap (canonical old)
-        ~(Just newFiles) = evalDebianT debianizationFileMap (canonical new) in
+    let ~(oldFiles) = fromJust $ evalDebianT debianizationFileMap (canonical old)
+        ~(newFiles) = fromJust $ evalDebianT debianizationFileMap (canonical new) in
     elems $ zipMaps doFile oldFiles newFiles
     where
       doFile :: FilePath -> Maybe Text -> Maybe Text -> Maybe String
