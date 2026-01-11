@@ -167,6 +167,7 @@ tests = TestList [ TestCase (assertEqual "Bundled1"
                          missing (Just "9.0.2") = Set.fromList ["bin-package-db", "hoopl"]
                          missing (Just "9.4.6") = Set.fromList ["bin-package-db", "hoopl"]
                          missing (Just "9.6.6") = Set.fromList ["bin-package-db", "hoopl"]
+                         missing (Just "9.10.3") = Set.fromList ["bin-package-db", "hoopl"]
                          missing _ = mempty
                          extra (Just "7.8.4") = Set.fromList ["haskell2010","haskell98","old-locale","old-time"]
                          extra (Just "8.0.1") = Set.fromList ["ghc-boot","ghc-boot-th","ghci"]
@@ -175,6 +176,7 @@ tests = TestList [ TestCase (assertEqual "Bundled1"
                          extra (Just "9.0.2") = Set.fromList ["exceptions", "ghc-bignum", "ghc-boot", "ghc-boot-th", "ghc-compact", "ghc-heap", "ghci", "libiserv", "mtl", "parsec", "stm", "text"]
                          extra (Just "9.4.6") = Set.fromList ["exceptions", "ghc-bignum", "ghc-boot", "ghc-boot-th", "ghc-compact", "ghc-heap", "ghci", "libiserv", "mtl", "parsec", "stm", "text"]
                          extra (Just "9.6.6") = Set.fromList ["Cabal-syntax","exceptions","ghc-bignum","ghc-boot","ghc-boot-th","ghc-compact","ghc-heap","ghci","libiserv","mtl","parsec","rts","stm","system-cxx-std-lib","text"]
+                         extra (Just "9.10.3") = Set.fromList ["Cabal-syntax","exceptions","ghc-bignum","ghc-boot","ghc-boot-th","ghc-compact","ghc-experimental","ghc-heap","ghc-internal","ghc-platform","ghc-toolchain","ghci","mtl","os-string","parsec","rts","semaphore-compat","stm","system-cxx-std-lib","text"]
                          extra _ = mempty
                      assertEqual "Bundled4"
                        (missing ver, extra ver)
