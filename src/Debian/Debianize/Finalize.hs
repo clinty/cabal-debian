@@ -60,7 +60,7 @@ import System.FilePath ((<.>), (</>), makeRelative, splitFileName, takeDirectory
 import System.IO (hPutStrLn, stderr)
 import Text.Parsec.Rfc2822 (NameAddr(..))
 import Distribution.Pretty (Pretty(pretty))
-#if MIN_VERSION_Cabal(3,14,0)
+#if MIN_VERSION_Cabal_syntax(3,14,0)
 import Distribution.Utils.Path (interpretSymbolicPath)
 #endif
 
@@ -571,7 +571,7 @@ makeUtilsPackage pkgDesc hc =
            installedExec = Set.unions (Map.elems installedExecMap)
 
        prefixPath <- dataTop
-#if MIN_VERSION_Cabal(3,14,0)
+#if MIN_VERSION_Cabal_syntax(3,14,0)
        let dFpD = List.map (interpretSymbolicPath Nothing) (Cabal.dataFiles pkgDesc)
 #else
        let dFpD = Cabal.dataFiles pkgDesc

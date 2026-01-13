@@ -20,16 +20,16 @@ import Distribution.Compiler (CompilerInfo)
 import Distribution.Package (Package(packageId))
 import Distribution.PackageDescription as Cabal (PackageDescription)
 import Distribution.PackageDescription.Configuration (finalizePD)
-#if MIN_VERSION_Cabal(3,16,0)
+#if MIN_VERSION_Cabal_syntax(3,16,0)
 import Distribution.Types.DependencySatisfaction (DependencySatisfaction(Satisfied))
 #endif
-#if MIN_VERSION_Cabal(3,8,1)
+#if MIN_VERSION_Cabal_syntax(3,8,1)
 import Distribution.Simple.PackageDescription (readGenericPackageDescription)
 #else
 import Distribution.PackageDescription.Parsec (readGenericPackageDescription)
 #endif
 import Distribution.Types.ComponentRequestedSpec (ComponentRequestedSpec(ComponentRequestedSpec))
-#if MIN_VERSION_Cabal(3,14,0)
+#if MIN_VERSION_Cabal_syntax(3,14,0)
 import Distribution.Simple.Utils (defaultPackageDescCwd, die', setupMessage)
 import Distribution.Utils.Path (relativeSymbolicPath)
 #else
@@ -37,11 +37,7 @@ import Distribution.Simple.Utils (defaultPackageDesc, die', setupMessage)
 #endif
 import Distribution.System as Cabal (buildArch, Platform(..))
 import qualified Distribution.System as Cabal (buildOS)
-#if MIN_VERSION_Cabal(3,2,0)
 import Distribution.Types.Flag (mkFlagAssignment)
-#else
-import Distribution.Types.GenericPackageDescription (mkFlagAssignment)
-#endif
 import Distribution.Verbosity (Verbosity)
 import Prelude hiding (break, lines, log, null, readFile, sum)
 import System.Directory (doesFileExist, getCurrentDirectory)
@@ -62,7 +58,7 @@ inputCabalization flags =
         -- Load a GenericPackageDescription from the current directory
         -- and from that create a finalized PackageDescription for the
         -- given CompilerId.
-#if MIN_VERSION_Cabal(3,14,0)
+#if MIN_VERSION_Cabal_syntax(3,14,0)
         genPkgDesc <- liftIO $ defaultPackageDescCwd vb >>= readGenericPackageDescription vb Nothing . relativeSymbolicPath
 #else
         genPkgDesc <- liftIO $ defaultPackageDesc vb >>= readGenericPackageDescription vb
@@ -78,7 +74,7 @@ inputCabalization flags =
                ePkgDesc
       vb = intToVerbosity' $ view verbosity flags
       fs = view cabalFlagAssignments flags
-#if MIN_VERSION_Cabal(3,16,0)
+#if MIN_VERSION_Cabal_syntax(3,16,0)
       satisfied = Satisfied
 #else
       satisfied = True

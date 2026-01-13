@@ -34,21 +34,21 @@ deriving instance Ord AbiTag
 deriving instance Data Compiler
 deriving instance Data CompilerId
 
-#if !MIN_VERSION_Cabal(3,10,1)
+#if !MIN_VERSION_Cabal_syntax(3,10,1)
 deriving instance Ord Language
 #endif
 deriving instance Ord Compiler
 deriving instance Ord NameAddr
-#if !MIN_VERSION_Cabal(3,10,1)
+#if !MIN_VERSION_Cabal_syntax(3,10,1)
 deriving instance Ord License
 #endif
 
-#if !MIN_VERSION_Cabal(3,10,1)
+#if !MIN_VERSION_Cabal_syntax(3,10,1)
 instance Ord Executable where
     compare = compare `on` exeName
 #endif
 
-#if !MIN_VERSION_Cabal(3,8,1)
+#if !MIN_VERSION_Cabal_syntax(3,8,1)
 instance Ord PackageDescription where
     compare = compare `on` package
 #endif
@@ -103,23 +103,14 @@ instance Pretty (PP VersionRange) where
     pretty (PP range) = (cataVersionRange prettyRange . normaliseVersionRange) range
 
 prettyRange :: VersionRangeF Text.PrettyPrint.HughesPJ.Doc -> Text.PrettyPrint.HughesPJ.Doc
-#if !MIN_VERSION_Cabal(3,4,0)
-prettyRange AnyVersionF                     = (text "*")
-#endif
 prettyRange (ThisVersionF v)                = text "=" <> pretty (PP v)
 prettyRange (LaterVersionF v)               = text ">" <> pretty (PP v)
 prettyRange (EarlierVersionF v)             = text "<" <> pretty (PP v)
 prettyRange (OrLaterVersionF v)             = text ">=" <> pretty (PP v)
 prettyRange (OrEarlierVersionF v)           = text "<=" <> pretty (PP v)
-#if !MIN_VERSION_Cabal(3,4,0)
-prettyRange (WildcardVersionF v)            = text "=" <> pretty (PP v) <> text ".*" -- not exactly right
-#endif
 prettyRange (MajorBoundVersionF v)          = text " >= " <> pretty (PP v) -- maybe this will do?
 prettyRange (UnionVersionRangesF v1 v2)     = text "(" <> v1 <> text " || " <> v2 <> text ")"
 prettyRange (IntersectVersionRangesF v1 v2) = text "(" <> v1 <> text " && " <> v2 <> text ")"
-#if !MIN_VERSION_Cabal(3,4,0)
-prettyRange (VersionRangeParensF v)         = text "(" <> v <> text ")"
-#endif
 
 instance Pretty (PP Version) where
     pretty = text . prettyShow . unPP

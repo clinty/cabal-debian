@@ -39,7 +39,7 @@ import Debian.Relation (BinPkgName(..), parseRelations, Relations, SrcPkgName(..
 --import Debug.Trace (trace)
 import Distribution.Package (PackageIdentifier(..), unPackageName)
 import qualified Distribution.PackageDescription as Cabal (dataDir, PackageDescription(package))
-#if MIN_VERSION_Cabal(3,14,0)
+#if MIN_VERSION_Cabal_syntax(3,14,0)
 import Distribution.Utils.Path (interpretSymbolicPath)
 #endif
 import Prelude hiding (break, lines, log, null, readFile, sum, words)
@@ -302,7 +302,7 @@ dataDest = do
 dataTop :: Monad m => CabalT m FilePath
 dataTop = do
   d <- use packageDescription
-#if MIN_VERSION_Cabal(3,14,0)
+#if MIN_VERSION_Cabal_syntax(3,14,0)
   return $ case interpretSymbolicPath Nothing (Cabal.dataDir d) of
 #else
   return $ case Cabal.dataDir d of
