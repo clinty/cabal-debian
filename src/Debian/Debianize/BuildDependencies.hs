@@ -99,7 +99,7 @@ allBuildDepends buildInfos =
 
       fixDeps :: CabalInfo -> [String] -> Relations
       fixDeps atoms =
-          concatMap (\ cab -> fromMaybe [[D.Rel (D.BinPkgName ("lib" ++ List.map toLower cab ++ "-dev")) Nothing Nothing]]
+          concatMap (\ cab -> fromMaybe [anyrel' (D.BinPkgName ("lib" ++ List.map toLower cab ++ "-dev"))]
                                         (Map.lookup cab (view (A.debInfo . D.extraLibMap) atoms)))
 
 setupBuildDepends :: SetupBuildInfo -> [Dependency_]
@@ -147,9 +147,9 @@ debianBuildDeps pkgDesc =
        ghcprof <- liftIO $ compilerPackageName hflavor B.Profiling
        let ghcrel = if member GHC hcs then maybe [] ((: []) . anyrel') ghcdev else []
        let ghcrelprof = if prof then maybe [] ((: []) . anyrel') ghcprof else []
-       let xs = nub $ [maybe [] (\ n -> [D.Rel (D.BinPkgName "debhelper-compat") (Just (D.EEQ (parseDebianVersion' (show n)))) Nothing]) compat,
-                       [D.Rel (D.BinPkgName "haskell-devscripts-minimal") Nothing Nothing,
-                        D.Rel (D.BinPkgName "haskell-devscripts") (Just $ D.GRE $ parseDebianVersion' ("0.16.42" :: String)) Nothing],
+       let xs = nub $ [maybe [] (\ n -> [D.RRel (D.BinPkgName "debhelper-compat") (Just (D.EEQ (parseDebianVersion' (show n)))) Nothing []]) compat,
+                       [D.RRel (D.BinPkgName "haskell-devscripts-minimal") Nothing Nothing [],
+                        D.RRel (D.BinPkgName "haskell-devscripts") (Just $ D.GRE $ parseDebianVersion' ("0.16.42" :: String)) Nothing []],
                        anyrel "dh-sequence-haskell"] ++
                       (ghcrel ++ ghcrelprof) ++
                        bDeps ++
@@ -232,7 +232,7 @@ adapt mp (PkgConfigDepends (Dependency pkg _ _)) =
 adapt mp (BuildTools (Dependency pkg _ _)) =
     maybe (aptFile (unPackageName pkg)) (: []) (Map.lookup (unPackageName pkg) mp)
 adapt _flags (ExtraLibs x) = [x]
-adapt _flags (BuildDepends (Dependency pkg _ _)) = [[[D.Rel (D.BinPkgName (unPackageName pkg)) Nothing Nothing]]]
+adapt _flags (BuildDepends (Dependency pkg _ _)) = [[anyrel' (D.BinPkgName (unPackageName pkg))]]
 
 -- There are three reasons this may not work, or may work
 -- incorrectly: (1) the build environment may be a different
@@ -253,15 +253,15 @@ aptFile pkg = unsafePerformIO $
                       case takeWhile (not . isSpace) out of
                         "" -> error $ "Unable to locate a debian package containing the build tool " ++ pkg ++
                                       ", try using --exec-map " ++ pkg ++ ":<debname> or execMap " ++ show pkg ++
-                                      " [[Rel (BinPkgName \"<debname>\") Nothing Nothing]]"
-                        s -> [[[D.Rel (D.BinPkgName s) Nothing Nothing]]]
+                                      " [[RRel (BinPkgName \"<debname>\") Nothing Nothing []]]"
+                        s -> [[anyrel' (D.BinPkgName s)]]
                   _ -> []
 
 anyrel :: String -> [D.Relation]
 anyrel x = anyrel' (D.BinPkgName x)
 
 anyrel' :: D.BinPkgName -> [D.Relation]
-anyrel' x = [D.Rel x Nothing Nothing]
+anyrel' x = [D.RRel x Nothing Nothing []]
 
 -- | Turn a cabal dependency into debian dependencies.  The result
 -- needs to correspond to a single debian package to be installed,
@@ -288,17 +288,17 @@ dependencies hc typ name cabalRange omitProfVersionDeps =
             False ->
                 Just <$> (cataVersionRange rangeToRange . normaliseVersionRange) range'''
           where
-            rangeToRange (ThisVersionF v)                = (debianVersion' name >=> \ dv -> return $ Rel' (D.Rel dname (Just (D.EEQ dv)) Nothing)) v
-            rangeToRange (LaterVersionF v)               = (debianVersion' name >=> \ dv -> return $ Rel' (D.Rel dname (Just (D.SGR dv)) Nothing)) v
-            rangeToRange (EarlierVersionF v)             = (debianVersion' name >=> \ dv -> return $ Rel' (D.Rel dname (Just (D.SLT dv)) Nothing)) v
+            rangeToRange (ThisVersionF v)                = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.EEQ dv)) Nothing [])) v
+            rangeToRange (LaterVersionF v)               = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.SGR dv)) Nothing [])) v
+            rangeToRange (EarlierVersionF v)             = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.SLT dv)) Nothing [])) v
             rangeToRange (OrLaterVersionF v)
-               | v == mkVersion [0] = return $ Rel' (D.Rel dname Nothing Nothing)
-               | otherwise = (debianVersion' name >=> \ dv -> return $ Rel' (D.Rel dname (Just (D.GRE dv)) Nothing)) v
-            rangeToRange (OrEarlierVersionF v)           = (debianVersion' name >=> \ dv -> return $ Rel' (D.Rel dname (Just (D.LTE dv)) Nothing)) v
+               | v == mkVersion [0] = return $ Rel' (D.RRel dname Nothing Nothing [])
+               | otherwise = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.GRE dv)) Nothing [])) v
+            rangeToRange (OrEarlierVersionF v)           = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.LTE dv)) Nothing [])) v
             rangeToRange (MajorBoundVersionF v)          = (\ x y -> debianVersion' name x >>= \ dvx ->
                                     debianVersion' name y >>= \ dvy ->
-                                    return $ And [Rel' (D.Rel dname (Just (D.GRE dvx)) Nothing),
-                                                  Rel' (D.Rel dname (Just (D.SLT dvy)) Nothing)]) v (majorUpperBound v)
+                                    return $ And [Rel' (D.RRel dname (Just (D.GRE dvx)) Nothing []),
+                                                  Rel' (D.RRel dname (Just (D.SLT dvy)) Nothing [])]) v (majorUpperBound v)
             rangeToRange (UnionVersionRangesF v1 v2)     = (\ x y -> x >>= \ x' -> y >>= \ y' -> return $ Or [x', y']) v1 v2
             rangeToRange (IntersectVersionRangesF v1 v2) = (\ x y -> x >>= \ x' -> y >>= \ y' -> return $ And [x', y']) v1 v2
             -- Choose the simpler of the two
@@ -336,8 +336,8 @@ doBundled typ name hc rels = do
       -- If a library is built into the compiler, this is the debian
       -- package name the compiler will conflict with.
       doRel :: MonadIO m => Maybe BinPkgName -> D.Relation -> CabalT m [D.Relation]
-      doRel hcname rel@(D.Rel dname req _) = do
-        let comp = maybe [] (\x -> [D.Rel x Nothing Nothing]) hcname
+      doRel hcname rel@(D.RRel dname req _ _) = do
+        let comp = maybe [] (\x -> [D.RRel x Nothing Nothing []]) hcname
         -- gver <- use ghcVersion
         -- Look at what version of the package is provided by the compiler.
         atoms <- get
@@ -390,4 +390,4 @@ canonical (Or rels) = And . List.map Or $ mapM (concatMap unOr . unAnd . canonic
 filterMissing :: Monad m => [[Relation]] -> CabalT m [[Relation]]
 filterMissing rels =
     get >>= \ atoms -> return $
-    List.filter (/= []) (List.map (List.filter (\ (Rel name _ _) -> not (Set.member name (view (A.debInfo . D.missingDependencies) atoms)))) rels)
+    List.filter (/= []) (List.map (List.filter (\ (RRel name _ _ _) -> not (Set.member name (view (A.debInfo . D.missingDependencies) atoms)))) rels)

@@ -43,7 +43,7 @@ import Debian.GHC (compilerPackageName)
 import Debian.Orphans ()
 import Debian.Policy (getCurrentDebianUser, getDebhelperCompatLevel, haskellMaintainer, maintainerOfLastResort, PackageArchitectures(Any, All), PackagePriority(Optional), parseMaintainer, parseStandardsVersion, Section(..), SourceFormat(Native3))
 import Debian.Pretty (PP(..), ppShow)
-import Debian.Relation (BinPkgName, BinPkgName(BinPkgName), Relation(Rel), Relations, SrcPkgName(SrcPkgName))
+import Debian.Relation (BinPkgName, BinPkgName(BinPkgName), Relation(RRel), Relations, SrcPkgName(SrcPkgName))
 import qualified Debian.Relation as D (BinPkgName(BinPkgName), Relation(..))
 import Debian.Time (getCurrentLocalRFC822Time)
 import qualified Debian.Version as V (buildDebianVersion, DebianVersion, parseDebianVersion', epoch, version, revision)
@@ -430,7 +430,7 @@ addExtraLibDependencies hc =
       g :: PackageDescription -> Map String Relations -> Relations
       g pkgDesc libMap = concatMap (devDep libMap) (nub $ concatMap Cabal.extraLibs $ Cabal.allBuildInfo $ pkgDesc)
       devDep :: Map String Relations -> String -> Relations
-      devDep libMap cab = maybe [[Rel (BinPkgName ("lib" ++ cab ++ "-dev")) Nothing Nothing]] id (Map.lookup cab libMap)
+      devDep libMap cab = maybe [[RRel (BinPkgName ("lib" ++ cab ++ "-dev")) Nothing Nothing []]] id (Map.lookup cab libMap)
 
 -- | Applies a few settings to official packages (unless already set)
 checkOfficialSettings :: (Monad m) => CompilerFlavor -> CabalT m ()
@@ -472,7 +472,7 @@ filterRelations badNames orRels =
     List.filter (not . List.null) (List.map filterOrRelation orRels)
     where
       filterOrRelation :: [Relation] -> [Relation]
-      filterOrRelation rels = List.filter (\ (Rel name _ _) -> not (elem name badNames)) rels
+      filterOrRelation rels = List.filter (\ (RRel name _ _ _) -> not (elem name badNames)) rels
 
 cabalExecBinaryPackage :: Monad m => BinPkgName -> CabalT m ()
 cabalExecBinaryPackage b =
@@ -752,7 +752,7 @@ anyrel :: String -> [D.Relation]
 anyrel x = anyrel' (D.BinPkgName x)
 
 anyrel' :: D.BinPkgName -> [D.Relation]
-anyrel' x = [D.Rel x Nothing Nothing]
+anyrel' x = [D.RRel x Nothing Nothing []]
 
 -- Lifted from Distribution.Simple.Setup, since it's not exported.
 flagList :: String -> [(FlagName, Bool)]

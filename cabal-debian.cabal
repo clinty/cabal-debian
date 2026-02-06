@@ -165,7 +165,7 @@ Library
     utf8-string,
     optparse-applicative >= 0.11 && < 0.20,
     prettyprinter,
-    debian >= 3.95
+    debian >= 4.1
   Exposed-Modules:
     Data.Maybe.Extended
     Debian.GHC
@@ -222,7 +222,7 @@ Test-Suite cabal-debian-tests
     Cabal >= 3.6 && < 3.17,
     Cabal-syntax >= 3.6 && < 3.17,
     containers,
-    debian >= 3.95,
+    debian >= 4.1,
     Diff >= 0.3.1 && < 2,
     directory,
     filepath,

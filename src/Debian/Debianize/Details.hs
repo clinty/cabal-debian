@@ -14,7 +14,7 @@ import Debian.Debianize.Monad (CabalT)
 import Debian.Debianize.CabalInfo as A (epochMap, debInfo)
 import Debian.Debianize.DebInfo as D (execMap)
 import Debian.Debianize.VersionSplits (DebBase(DebBase))
-import Debian.Relation (BinPkgName(BinPkgName), Relation(Rel))
+import Debian.Relation (BinPkgName(BinPkgName), Relation(RRel))
 import Distribution.Package (mkPackageName)
 import Distribution.Version (mkVersion)
 
@@ -28,7 +28,7 @@ debianDefaults =
        A.epochMap %= Map.insert (mkPackageName "HTTP") 1
        -- Associate some build tools and their corresponding
        -- (eponymous) debian package names
-       mapM_ (\name -> (A.debInfo . D.execMap) %= Map.insert name [[Rel (BinPkgName name) Nothing Nothing]])
+       mapM_ (\name -> (A.debInfo . D.execMap) %= Map.insert name [[RRel (BinPkgName name) Nothing Nothing []]])
             ["alex", "c2hs", "ghc", "happy", "hsx2hs"]
        mapCabal (mkPackageName "QuickCheck") (DebBase "quickcheck2")
        -- Something was required for this package at one time - it

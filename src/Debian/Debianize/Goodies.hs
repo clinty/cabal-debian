@@ -32,7 +32,7 @@ import qualified Debian.Debianize.BinaryDebDescription as B
 import Debian.Orphans ()
 import Debian.Policy (apacheAccessLog, apacheErrorLog, apacheLogDirectory, databaseDirectory, dataDirectory, serverAccessLog, serverAppLog)
 import Debian.Pretty (ppText)
-import Debian.Relation (BinPkgName(BinPkgName), Relation(Rel))
+import Debian.Relation (BinPkgName(BinPkgName), Relation(RRel))
 import Distribution.PackageDescription as Cabal (PackageDescription)
 import Distribution.Simple.Build.PathsModule (pkgPathEnvVar)
 import Prelude hiding (init, log, map, unlines, writeFile)
@@ -87,8 +87,8 @@ doWebsite p w = (A.debInfo . D.website) %= Map.insert p w
 doBackups :: Monad m => BinPkgName -> String -> CabalT m ()
 doBackups bin s =
     do (A.debInfo . D.backups) %= Map.insert bin s
-       (A.debInfo . D.binaryDebDescription bin . B.relations . B.depends) %= (++ [[Rel (BinPkgName "anacron") Nothing Nothing]])
-       -- depends +++= (bin, Rel (BinPkgName "anacron") Nothing Nothing)
+       (A.debInfo . D.binaryDebDescription bin . B.relations . B.depends) %= (++ [[RRel (BinPkgName "anacron") Nothing Nothing []]])
+       -- depends +++= (bin, RRel (BinPkgName "anacron") Nothing Nothing [])
 
 oldClckwrksSiteFlags :: D.Site -> [String]
 oldClckwrksSiteFlags x =

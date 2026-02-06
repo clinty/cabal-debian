@@ -159,12 +159,12 @@ test1 label =
                 (S.maintainer . D.control . debInfo) .= Just (NameAddr (Just "David Fox") "dsf@seereason.com")
                 (S.standardsVersion . D.control . debInfo) .= Just (StandardsVersion 3 9 3 (Just 1)) -- This will change as new versions of debian-policy are released
                 (S.buildDepends . D.control . debInfo) %=
-                                  (++ [[Rel (BinPkgName "debhelper") (Just (GRE (parseDebianVersion ("9" :: String)))) Nothing],
-                                       [Rel (BinPkgName "haskell-devscripts") (Just (GRE (parseDebianVersion ("0.9" :: String)))) Nothing],
-                                       [Rel (BinPkgName "cdbs") Nothing Nothing],
-                                       [Rel (BinPkgName "ghc") Nothing Nothing],
-                                       [Rel (BinPkgName "ghc-prof") Nothing Nothing]])
-                (S.buildDependsIndep . D.control . debInfo) %= (++ [[Rel (BinPkgName "ghc-doc") Nothing Nothing]]))
+                                  (++ [[RRel (BinPkgName "debhelper") (Just (GRE (parseDebianVersion ("9" :: String)))) Nothing []],
+                                       [RRel (BinPkgName "haskell-devscripts") (Just (GRE (parseDebianVersion ("0.9" :: String)))) Nothing []],
+                                       [anyrel (BinPkgName "cdbs")],
+                                       [anyrel (BinPkgName "ghc") ],
+                                       [anyrel (BinPkgName "ghc-prof")]])
+                (S.buildDependsIndep . D.control . debInfo) %= (++ [[anyrel (BinPkgName "ghc-doc")]]))
             atoms
       log = ChangeLog [Entry { logPackage = "haskell-cabal-debian"
                              , logVersion = buildDebianVersion Nothing "2.6.2" Nothing
@@ -206,12 +206,12 @@ test2 label =
                 (S.maintainer . D.control . debInfo) .= Just (NameAddr {nameAddr_name = Just "David Fox", nameAddr_addr = "dsf@seereason.com"})
                 (S.standardsVersion . D.control . debInfo) .= Just (StandardsVersion 3 9 3 (Just 1))
                 (S.buildDepends . D.control . debInfo)
-                               %= (++ [[Rel (BinPkgName "debhelper") (Just (GRE (parseDebianVersion ("7.0" :: String)))) Nothing],
-                                       [Rel (BinPkgName "haskell-devscripts") (Just (GRE (parseDebianVersion ("0.8" :: String)))) Nothing],
-                                       [Rel (BinPkgName "cdbs") Nothing Nothing],
-                                       [Rel (BinPkgName "ghc") Nothing Nothing],
-                                       [Rel (BinPkgName "ghc-prof") Nothing Nothing]])
-                (S.buildDependsIndep . D.control . debInfo) %= (++ [[Rel (BinPkgName "ghc-doc") Nothing Nothing]]))
+                               %= (++ [[RRel (BinPkgName "debhelper") (Just (GRE (parseDebianVersion ("7.0" :: String)))) Nothing []],
+                                       [RRel (BinPkgName "haskell-devscripts") (Just (GRE (parseDebianVersion ("0.8" :: String)))) Nothing []],
+                                       [anyrel (BinPkgName "cdbs")],
+                                       [anyrel (BinPkgName "ghc")],
+                                       [anyrel (BinPkgName "ghc-prof")]])
+                (S.buildDependsIndep . D.control . debInfo) %= (++ [[anyrel (BinPkgName "ghc-doc")]]))
             atoms
       log = ChangeLog [Entry {logPackage = "haskell-cabal-debian",
                               logVersion = Debian.Version.parseDebianVersion ("2.6.2" :: String),
@@ -302,8 +302,8 @@ test3 label =
                 (debInfo . D.control . S.uploaders) .= [NameAddr {nameAddr_name = Just "Marco Silva", nameAddr_addr = "marcot@debian.org"},NameAddr {nameAddr_name = Just "Joachim Breitner", nameAddr_addr = "nomeata@debian.org"}]
                 (debInfo . D.control . S.priority) .= Just Extra
                 (debInfo . D.control . S.section) .= Just (MainSection "haskell")
-                (debInfo . D.control . S.buildDepends) %= (++ [[Rel (BinPkgName {unBinPkgName = "debhelper"}) (Just (GRE (Debian.Version.parseDebianVersion' ("7" :: String)))) Nothing]])
-                (debInfo . D.control . S.buildDependsIndep) %=  (++ [[Rel (BinPkgName {unBinPkgName = "perl"}) Nothing Nothing]])
+                (debInfo . D.control . S.buildDepends) %= (++ [[RRel (BinPkgName {unBinPkgName = "debhelper"}) (Just (GRE (Debian.Version.parseDebianVersion' ("7" :: String)))) Nothing []]])
+                (debInfo . D.control . S.buildDependsIndep) %=  (++ [[anyrel (BinPkgName {unBinPkgName = "perl"})]])
                 (debInfo . D.control . S.standardsVersion) .= Just (StandardsVersion 3 9 4 Nothing)
                 (debInfo . D.control . S.vcsFields) %= Set.union (Set.fromList [ S.VCSBrowser "http://darcs.debian.org/cgi-bin/darcsweb.cgi?r=pkg-haskell/haskell-devscripts"
                                                        , S.VCSDarcs "http://darcs.debian.org/pkg-haskell/haskell-devscripts"])
@@ -321,23 +321,23 @@ test3 label =
                                           " generate appropriate substvars entries for each one, and install the",
                                           " package in the Debian temporary area as part of the build process."])
                 (debInfo . D.binaryDebDescription (BinPkgName "haskell-devscripts") . B.relations . B.depends) .=
-                     [ [Rel (BinPkgName {unBinPkgName = "dctrl-tools"}) Nothing Nothing]
-                     , [Rel (BinPkgName {unBinPkgName = "debhelper"}) Nothing Nothing]
-                     , [Rel (BinPkgName {unBinPkgName = "dh-buildinfo"}) Nothing Nothing]
-                     , [Rel (BinPkgName {unBinPkgName = "ghc"}) (Just (GRE (Debian.Version.parseDebianVersion'("7.6" :: String)))) Nothing]
-                     , [Rel (BinPkgName {unBinPkgName = "cdbs"}) Nothing Nothing]
-                     , [Rel (BinPkgName {unBinPkgName = "${misc:Depends}"}) Nothing Nothing]
-                     , [Rel (BinPkgName {unBinPkgName = "html-xml-utils"}) Nothing Nothing]
-                     , [Rel (BinPkgName {unBinPkgName = "hscolour"}) (Just (GRE (Debian.Version.parseDebianVersion'("1.8" :: String)))) Nothing]
-                     , [Rel (BinPkgName {unBinPkgName = "ghc-haddock"}) (Just (GRE (Debian.Version.parseDebianVersion'("7.4" :: String)))) Nothing] ]
+                     [ [anyrel (BinPkgName {unBinPkgName = "dctrl-tools"})]
+                     , [anyrel (BinPkgName {unBinPkgName = "debhelper"})]
+                     , [anyrel (BinPkgName {unBinPkgName = "dh-buildinfo"})]
+                     , [RRel (BinPkgName {unBinPkgName = "ghc"}) (Just (GRE (Debian.Version.parseDebianVersion'("7.6" :: String)))) Nothing []]
+                     , [anyrel (BinPkgName {unBinPkgName = "cdbs"})]
+                     , [anyrel (BinPkgName {unBinPkgName = "${misc:Depends}"})]
+                     , [anyrel (BinPkgName {unBinPkgName = "html-xml-utils"})]
+                     , [RRel (BinPkgName {unBinPkgName = "hscolour"}) (Just (GRE (Debian.Version.parseDebianVersion'("1.8" :: String)))) Nothing []]
+                     , [RRel (BinPkgName {unBinPkgName = "ghc-haddock"}) (Just (GRE (Debian.Version.parseDebianVersion'("7.4" :: String)))) Nothing []] ]
 {-
                 control %= (\ y -> y { S.source = 
                                      , S.maintainer = Just (NameAddr {nameAddr_name = Just "Debian Haskell Group", nameAddr_addr = "pkg-haskell-maintainers@lists.alioth.debian.org"})
                                      , S.uploaders = [NameAddr {nameAddr_name = Just "Marco Silva", nameAddr_addr = "marcot@debian.org"},NameAddr {nameAddr_name = Just "Joachim Breitner", nameAddr_addr = "nomeata@debian.org"}]
                                      , S.priority = Just Extra
                                      , S.section = Just (MainSection "haskell")
-                                     , S.buildDepends = (S.buildDepends y) ++ [[Rel (BinPkgName {unBinPkgName = "debhelper"}) (Just (GRE (Debian.Version.parseDebianVersion'("7" :: String)))) Nothing]]
-                                     , S.buildDependsIndep = (S.buildDependsIndep y) ++ [[Rel (BinPkgName {unBinPkgName = "perl"}) Nothing Nothing]]
+                                     , S.buildDepends = (S.buildDepends y) ++ [[RRel (BinPkgName {unBinPkgName = "debhelper"}) (Just (GRE (Debian.Version.parseDebianVersion'("7" :: String)))) Nothing []]]
+                                     , S.buildDependsIndep = (S.buildDependsIndep y) ++ [[RRel (BinPkgName {unBinPkgName = "perl"}) Nothing Nothing []]]
                                      , S.standardsVersion = Just (StandardsVersion 3 9 4 Nothing)
                                      , S.vcsFields = Set.union (S.vcsFields y) (Set.fromList [ S.VCSBrowser "http://darcs.debian.org/cgi-bin/darcsweb.cgi?r=pkg-haskell/haskell-devscripts"
                                                                                                  , S.VCSDarcs "http://darcs.debian.org/pkg-haskell/haskell-devscripts"])
@@ -361,15 +361,15 @@ test3 label =
                                                                                       , B.relations =
                                                                                           B.PackageRelations
                                                                                             { B.depends =
-                                                                                              [ [Rel (BinPkgName {unBinPkgName = "dctrl-tools"}) Nothing Nothing]
-                                                                                              , [Rel (BinPkgName {unBinPkgName = "debhelper"}) Nothing Nothing]
-                                                                                              , [Rel (BinPkgName {unBinPkgName = "dh-buildinfo"}) Nothing Nothing]
-                                                                                              , [Rel (BinPkgName {unBinPkgName = "ghc"}) (Just (GRE (Debian.Version.parseDebianVersion'("7.6" :: String)))) Nothing]
-                                                                                              , [Rel (BinPkgName {unBinPkgName = "cdbs"}) Nothing Nothing]
-                                                                                              , [Rel (BinPkgName {unBinPkgName = "${misc:Depends}"}) Nothing Nothing]
-                                                                                              , [Rel (BinPkgName {unBinPkgName = "html-xml-utils"}) Nothing Nothing]
-                                                                                              , [Rel (BinPkgName {unBinPkgName = "hscolour"}) (Just (GRE (Debian.Version.parseDebianVersion'("1.8" :: String)))) Nothing]
-                                                                                              , [Rel (BinPkgName {unBinPkgName = "ghc-haddock"}) (Just (GRE (Debian.Version.parseDebianVersion'("7.4" :: String)))) Nothing] ]
+                                                                                              [ [anyrel (BinPkgName {unBinPkgName = "dctrl-tools"})]
+                                                                                              , [anyrel (BinPkgName {unBinPkgName = "debhelper"})]
+                                                                                              , [anyrel (BinPkgName {unBinPkgName = "dh-buildinfo"})]
+                                                                                              , [RRel (BinPkgName {unBinPkgName = "ghc"}) (Just (GRE (Debian.Version.parseDebianVersion'("7.6" :: String)))) Nothing []]
+                                                                                              , [anyrel (BinPkgName {unBinPkgName = "cdbs"})]
+                                                                                              , [anyrel (BinPkgName {unBinPkgName = "${misc:Depends}"})]
+                                                                                              , [anyrel (BinPkgName {unBinPkgName = "html-xml-utils"})]
+                                                                                              , [RRel (BinPkgName {unBinPkgName = "hscolour"}) (Just (GRE (Debian.Version.parseDebianVersion'("1.8" :: String)))) Nothing []]
+                                                                                              , [RRel (BinPkgName {unBinPkgName = "ghc-haddock"}) (Just (GRE (Debian.Version.parseDebianVersion'("7.4" :: String)))) Nothing []] ]
                                                                                             , B.recommends = []
                                                                                             , B.suggests = []
                                                                                             , B.preDepends = []
@@ -503,7 +503,7 @@ test4 label =
       json2Path = "/usr/share/clckwrks-0.13.2/json2"
 
 anyrel :: BinPkgName -> Relation
-anyrel b = Rel b Nothing Nothing
+anyrel b = RRel b Nothing Nothing []
 
 test5 :: String -> Test
 test5 label =
@@ -526,7 +526,7 @@ test5 label =
              doWebsite (BinPkgName "creativeprompts-production") (theSite (BinPkgName "creativeprompts-production"))
              doServer (BinPkgName "creativeprompts-development") (theServer (BinPkgName "creativeprompts-development"))
              doBackups (BinPkgName "creativeprompts-backups") "creativeprompts-backups"
-             (A.debInfo . D.execMap) %= Map.insert "trhsx" [[Rel (BinPkgName "haskell-hsx-utils") Nothing Nothing]]
+             (A.debInfo . D.execMap) %= Map.insert "trhsx" [[anyrel (BinPkgName "haskell-hsx-utils")]]
              mapM_ (\ b -> (debInfo . D.binaryDebDescription b . B.relations . B.depends) %= \ deps -> deps ++ [[anyrel (BinPkgName "markdown")]])
                    [(BinPkgName "creativeprompts-production"), (BinPkgName "creativeprompts-development")]
              (debInfo . D.binaryDebDescription (BinPkgName "creativeprompts-development") . B.description) .=
@@ -631,7 +631,7 @@ test8 label =
       customize Nothing = error "Missing changelog"
       customize (Just log) =
           do (debInfo . D.flags . verbosity) .= 1
-             (debInfo . D.control . S.buildDepends) %= (++ [[Rel (BinPkgName "haskell-hsx-utils") Nothing Nothing]])
+             (debInfo . D.control . S.buildDepends) %= (++ [[anyrel (BinPkgName "haskell-hsx-utils")]])
              (debInfo . D.control . S.homepage) .= Just "https://artvaluereportonline.com"
              (debInfo . D.sourceFormat) .= Native3
              (debInfo . D.changelog) .= Just log
@@ -677,7 +677,7 @@ test9 label =
                           (D.InstallFile {D.execName = "alex", D.destName = "alex", D.sourceDir = Nothing, D.destDir = Nothing})
              -- Bootstrap self-dependency
              (debInfo . D.allowDebianSelfBuildDeps) .= True
-             (debInfo . D.control . S.buildDepends) %= (++ [[Rel (BinPkgName "alex") Nothing Nothing]])
+             (debInfo . D.control . S.buildDepends) %= (++ [[anyrel (BinPkgName "alex")]])
 
 test10 :: String -> Test
 test10 label =
@@ -701,7 +701,7 @@ test10 label =
              (A.debInfo . D.compat) .= Just 13
              (A.debInfo . D.control . S.standardsVersion) .= Just (StandardsVersion 3 8 1 Nothing)
              (A.debInfo . D.control . S.maintainer) .= parseMaintainer "David Fox <dsf@seereason.com>"
-             (A.debInfo . D.binaryDebDescription (BinPkgName "seereason-darcs-backups") . B.relations . B.depends) %= (++ [[Rel (BinPkgName "anacron") Nothing Nothing]])
+             (A.debInfo . D.binaryDebDescription (BinPkgName "seereason-darcs-backups") . B.relations . B.depends) %= (++ [[anyrel (BinPkgName "anacron")]])
              (A.debInfo . D.control . S.section) .= Just (MainSection "haskell")
              (A.debInfo . D.utilsPackageNameBase) .= Just "seereason-darcs-backups"
              (A.debInfo . D.atomSet) %= (Set.insert $ D.InstallCabalExec (BinPkgName "seereason-darcs-backups") "seereason-darcs-backups" "/etc/cron.hourly")

@@ -24,7 +24,7 @@
 -- > import Control.Lens
 -- > import Data.Map as Map
 -- > import Data.Set as Set
--- > import Debian.Relation (BinPkgName(BinPkgName), Relation(Rel))
+-- > import Debian.Relation (BinPkgName(BinPkgName), Relation(RRel))
 -- > import Debian.Debianize
 -- > main = performDebianization $ do
 -- >   debianDefaults
