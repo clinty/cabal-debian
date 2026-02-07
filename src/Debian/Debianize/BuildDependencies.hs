@@ -288,17 +288,18 @@ dependencies hc typ name cabalRange omitProfVersionDeps =
             False ->
                 Just <$> (cataVersionRange rangeToRange . normaliseVersionRange) range'''
           where
-            rangeToRange (ThisVersionF v)                = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.EEQ dv)) Nothing [])) v
-            rangeToRange (LaterVersionF v)               = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.SGR dv)) Nothing [])) v
-            rangeToRange (EarlierVersionF v)             = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.SLT dv)) Nothing [])) v
+            rlist = [] -- FIXME
+            rangeToRange (ThisVersionF v)                = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.EEQ dv)) Nothing rlist)) v
+            rangeToRange (LaterVersionF v)               = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.SGR dv)) Nothing rlist)) v
+            rangeToRange (EarlierVersionF v)             = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.SLT dv)) Nothing rlist)) v
             rangeToRange (OrLaterVersionF v)
-               | v == mkVersion [0] = return $ Rel' (D.RRel dname Nothing Nothing [])
-               | otherwise = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.GRE dv)) Nothing [])) v
-            rangeToRange (OrEarlierVersionF v)           = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.LTE dv)) Nothing [])) v
+               | v == mkVersion [0] = return $ Rel' (D.RRel dname Nothing Nothing rlist)
+               | otherwise = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.GRE dv)) Nothing rlist)) v
+            rangeToRange (OrEarlierVersionF v)           = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.LTE dv)) Nothing rlist)) v
             rangeToRange (MajorBoundVersionF v)          = (\ x y -> debianVersion' name x >>= \ dvx ->
                                     debianVersion' name y >>= \ dvy ->
-                                    return $ And [Rel' (D.RRel dname (Just (D.GRE dvx)) Nothing []),
-                                                  Rel' (D.RRel dname (Just (D.SLT dvy)) Nothing [])]) v (majorUpperBound v)
+                                    return $ And [Rel' (D.RRel dname (Just (D.GRE dvx)) Nothing rlist),
+                                                  Rel' (D.RRel dname (Just (D.SLT dvy)) Nothing rlist)]) v (majorUpperBound v)
             rangeToRange (UnionVersionRangesF v1 v2)     = (\ x y -> x >>= \ x' -> y >>= \ y' -> return $ Or [x', y']) v1 v2
             rangeToRange (IntersectVersionRangesF v1 v2) = (\ x y -> x >>= \ x' -> y >>= \ y' -> return $ And [x', y']) v1 v2
             -- Choose the simpler of the two
