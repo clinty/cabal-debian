@@ -15,6 +15,7 @@ import Data.Char (isSpace, toLower)
 import Data.Function (on)
 import Data.List as List (filter, groupBy, map, minimumBy, nub, sortBy)
 import Data.Map as Map (lookup, Map)
+import qualified Data.Map.Ordered as MO
 import Data.Maybe (catMaybes, fromMaybe, isJust, isNothing, listToMaybe, mapMaybe, maybeToList)
 import Data.Set as Set (empty, fold, fromList, map, member, Set, singleton, toList, union)
 import Debian.Debianize.Prelude
@@ -29,7 +30,7 @@ import qualified Debian.Debianize.SourceDebDescription as S
 import Debian.Debianize.VersionSplits (packageRangesFromVersionSplits)
 import Debian.GHC (compilerPackageName)
 import Debian.Orphans ()
-import Debian.Relation (BinPkgName(..), checkVersionReq, Relation(..), Relations)
+import Debian.Relation (BinPkgName(..), checkVersionReq, Relation(..), Relations, RestrictionList)
 import qualified Debian.Relation as D (BinPkgName(BinPkgName), Relation(..), Relations, VersionReq(EEQ, GRE, LTE, SGR, SLT))
 import Debian.Version (DebianVersion, parseDebianVersion')
 import Distribution.Compiler (CompilerFlavor(..))
@@ -135,10 +136,10 @@ debianBuildDeps pkgDesc =
        testsStatus <- use (A.debInfo . D.testsStatus)
 
        cDeps <- nub . concat . concat <$> sequence
-            [ mapM (buildDependencies hcTypePairs) libDeps
-            , mapM (buildDependencies hcTypePairs) binDeps
-            , mapM (buildDependencies hcTypePairs) setupDeps
-            , mapM (buildDependencies hcTypePairs) (if testsStatus /= D.TestsDisable then testDeps else [])
+            [ mapM (buildDependencies [] hcTypePairs) libDeps
+            , mapM (buildDependencies [] hcTypePairs) binDeps
+            , mapM (buildDependencies [] hcTypePairs) setupDeps
+            , mapM (buildDependencies [MO.singleton ("nocheck", False)] hcTypePairs) (if testsStatus /= D.TestsDisable then testDeps else [])
             ]
 
        bDeps <- use (A.debInfo . D.control . S.buildDepends)
@@ -205,20 +206,20 @@ docDependencies (BuildDepends (Dependency name ranges _)) =
     do hc <- use (A.debInfo . D.flags . compilerFlavor)
        let hcs = singleton hc -- vestigial
        omitProfDeps <- use (A.debInfo . D.omitProfVersionDeps)
-       concat <$> mapM (\ hc' -> dependencies hc' B.Documentation name ranges omitProfDeps) (toList hcs)
+       concat <$> mapM (\ hc' -> dependencies hc' B.Documentation name ranges omitProfDeps []) (toList hcs)
 docDependencies _ = return []
 
 -- | The Debian build dependencies for a package include the profiling
 -- libraries and the documentation packages, used for creating cross
 -- references.  Also the packages associated with extra libraries.
-buildDependencies :: (MonadIO m) => Set (CompilerFlavor, B.PackageType) -> Dependency_ -> CabalT m D.Relations
-buildDependencies hcTypePairs (BuildDepends (Dependency name ranges _)) =
+buildDependencies :: (MonadIO m) => [RestrictionList] -> Set (CompilerFlavor, B.PackageType) -> Dependency_ -> CabalT m D.Relations
+buildDependencies rlists hcTypePairs (BuildDepends (Dependency name ranges _)) =
     use (A.debInfo . D.omitProfVersionDeps) >>= \ omitProfDeps ->
-    concat <$> mapM (\ (hc, typ) -> dependencies hc typ name ranges omitProfDeps) (toList hcTypePairs)
-buildDependencies _ dep@(ExtraLibs _) =
+    concat <$> mapM (\ (hc, typ) -> dependencies hc typ name ranges omitProfDeps rlists) (toList hcTypePairs)
+buildDependencies _rlists _ dep@(ExtraLibs _) =
     do mp <- use (A.debInfo . D.execMap)
        return $ concat $ adapt mp dep
-buildDependencies _ dep =
+buildDependencies _rlists _ dep =
     case unboxDependency dep of
       Just (Dependency _name _ranges _) ->
           do mp <- view (A.debInfo . D.execMap) <$> get
@@ -266,8 +267,8 @@ anyrel' x = [D.RRel x Nothing Nothing []]
 -- | Turn a cabal dependency into debian dependencies.  The result
 -- needs to correspond to a single debian package to be installed,
 -- so we will return just an OrRelation.
-dependencies :: MonadIO m => CompilerFlavor -> B.PackageType -> PackageName -> VersionRange -> Bool -> CabalT m Relations
-dependencies hc typ name cabalRange omitProfVersionDeps =
+dependencies :: MonadIO m => CompilerFlavor -> B.PackageType -> PackageName -> VersionRange -> Bool -> [RestrictionList] -> CabalT m Relations
+dependencies hc typ name cabalRange omitProfVersionDeps rlists =
     do nameMap <- use A.debianNameMap
        -- Compute a list of alternative debian dependencies for
        -- satisfying a cabal dependency.  The only caveat is that
@@ -288,18 +289,17 @@ dependencies hc typ name cabalRange omitProfVersionDeps =
             False ->
                 Just <$> (cataVersionRange rangeToRange . normaliseVersionRange) range'''
           where
-            rlist = [] -- FIXME
-            rangeToRange (ThisVersionF v)                = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.EEQ dv)) Nothing rlist)) v
-            rangeToRange (LaterVersionF v)               = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.SGR dv)) Nothing rlist)) v
-            rangeToRange (EarlierVersionF v)             = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.SLT dv)) Nothing rlist)) v
+            rangeToRange (ThisVersionF v)                = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.EEQ dv)) Nothing rlists)) v
+            rangeToRange (LaterVersionF v)               = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.SGR dv)) Nothing rlists)) v
+            rangeToRange (EarlierVersionF v)             = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.SLT dv)) Nothing rlists)) v
             rangeToRange (OrLaterVersionF v)
-               | v == mkVersion [0] = return $ Rel' (D.RRel dname Nothing Nothing rlist)
-               | otherwise = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.GRE dv)) Nothing rlist)) v
-            rangeToRange (OrEarlierVersionF v)           = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.LTE dv)) Nothing rlist)) v
+               | v == mkVersion [0] = return $ Rel' (D.RRel dname Nothing Nothing rlists)
+               | otherwise = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.GRE dv)) Nothing rlists)) v
+            rangeToRange (OrEarlierVersionF v)           = (debianVersion' name >=> \ dv -> return $ Rel' (D.RRel dname (Just (D.LTE dv)) Nothing rlists)) v
             rangeToRange (MajorBoundVersionF v)          = (\ x y -> debianVersion' name x >>= \ dvx ->
                                     debianVersion' name y >>= \ dvy ->
-                                    return $ And [Rel' (D.RRel dname (Just (D.GRE dvx)) Nothing rlist),
-                                                  Rel' (D.RRel dname (Just (D.SLT dvy)) Nothing rlist)]) v (majorUpperBound v)
+                                    return $ And [Rel' (D.RRel dname (Just (D.GRE dvx)) Nothing rlists),
+                                                  Rel' (D.RRel dname (Just (D.SLT dvy)) Nothing rlists)]) v (majorUpperBound v)
             rangeToRange (UnionVersionRangesF v1 v2)     = (\ x y -> x >>= \ x' -> y >>= \ y' -> return $ Or [x', y']) v1 v2
             rangeToRange (IntersectVersionRangesF v1 v2) = (\ x y -> x >>= \ x' -> y >>= \ y' -> return $ And [x', y']) v1 v2
             -- Choose the simpler of the two
