@@ -1,2 +1,4 @@
-version=4
-https://hackage.haskell.org/package/alex/distro-monitor .*-([0-9\.]+)\.(?:zip|tgz|tbz|txz|(?:tar\.(?:gz|bz2|xz)))
+Version: 5
+
+Source: https://hackage.haskell.org/package/alex/distro-monitor
+Matching-Pattern: .*-([0-9\.]+).(?:zip|tgz|tbz|txz|(?:tar\.(?:gz|bz2|xz)))
