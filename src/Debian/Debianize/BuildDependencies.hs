@@ -149,8 +149,6 @@ debianBuildDeps pkgDesc =
        let ghcrel = if member GHC hcs then maybe [] ((: []) . anyrel') ghcdev else []
        let ghcrelprof = if prof then maybe [] ((: []) . anyrel') ghcprof else []
        let xs = nub $ [maybe [] (\ n -> [D.RRel (D.BinPkgName "debhelper-compat") (Just (D.EEQ (parseDebianVersion' (show n)))) Nothing []]) compat,
-                       [D.RRel (D.BinPkgName "haskell-devscripts-minimal") Nothing Nothing [],
-                        D.RRel (D.BinPkgName "haskell-devscripts") (Just $ D.GRE $ parseDebianVersion' ("0.16.42" :: String)) Nothing []],
                        anyrel "dh-sequence-haskell"] ++
                       (ghcrel ++ ghcrelprof) ++
                        bDeps ++
