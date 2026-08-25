@@ -1,9 +1,7 @@
 Source: seereason-darcs-backups
-Priority: optional
 Maintainer: David Fox <dsf@seereason.com>
 Section: haskell
 Build-Depends: debhelper-compat (= 13)
-               , haskell-devscripts-minimal | haskell-devscripts (>= 0.16.42)
                , dh-sequence-haskell
                , ghc
 	       , ghc-prof
