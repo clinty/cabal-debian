@@ -176,7 +176,7 @@ controlFile src =
             (case view S.dmUploadAllowed src of True -> [Field ("DM-Upload-Allowed", " yes")]; False -> []) ++
             mField "Priority" (view S.priority src) ++
             mField "Section" (view S.section src) ++
-            [Field ("Rules-Requires-Root", (if view S.rulesRequiresRoot src then " yes" else " no"))] ++
+            maybe [] (\ b -> [Field ("Rules-Requires-Root", if b then " yes" else " no")]) (view S.rulesRequiresRoot src) ++
             depField "Build-Depends" (view S.buildDepends src) ++
             depField "Build-Depends-Indep" (view S.buildDependsIndep src) ++
             depField "Build-Conflicts" (view S.buildConflicts src) ++
