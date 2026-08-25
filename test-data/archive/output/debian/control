@@ -1,5 +1,4 @@
 Source: seereason-darcs-backups
-Priority: optional
 Maintainer: David Fox <dsf@seereason.com>
 Section: haskell
 Build-Depends: debhelper-compat (= 13)

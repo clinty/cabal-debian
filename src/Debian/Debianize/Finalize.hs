@@ -41,7 +41,7 @@ import qualified Debian.Debianize.SourceDebDescription as S
 import Debian.Debianize.VersionSplits (DebBase(DebBase))
 import Debian.GHC (compilerPackageName)
 import Debian.Orphans ()
-import Debian.Policy (getCurrentDebianUser, getDebhelperCompatLevel, haskellMaintainer, maintainerOfLastResort, PackageArchitectures(Any, All), PackagePriority(Optional), parseMaintainer, parseStandardsVersion, Section(..), SourceFormat(Native3))
+import Debian.Policy (getCurrentDebianUser, getDebhelperCompatLevel, haskellMaintainer, maintainerOfLastResort, PackageArchitectures(Any, All), parseMaintainer, parseStandardsVersion, Section(..), SourceFormat(Native3))
 import Debian.Pretty (PP(..), ppShow)
 import Debian.Relation (BinPkgName, BinPkgName(BinPkgName), Relation(RRel), Relations, SrcPkgName(SrcPkgName))
 import qualified Debian.Relation as D (BinPkgName(BinPkgName), Relation(..))
@@ -127,7 +127,6 @@ finalizeDebianization' goodies date currentUser debhelperCompat =
        addExtraLibDependencies hc
        (A.debInfo . D.watch) .?= Just (watchAtom (pkgName $ Cabal.package $ pkgDesc))
        (A.debInfo . D.control . S.section) .?= Just (MainSection "haskell")
-       (A.debInfo . D.control . S.priority) .?= Just Optional
        (A.debInfo . D.compat) .?= debhelperCompat
        finalizeChangelog date currentUser
        finalizeControl currentUser

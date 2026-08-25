@@ -1,6 +1,5 @@
 Source: haskell-clckwrks-dot-com
 Maintainer: Jeremy Shaw <jeremy@n-heptane.com>
-Priority: optional
 Section: haskell
 Build-Depends: debhelper-compat (= 13)
                , dh-sequence-haskell
